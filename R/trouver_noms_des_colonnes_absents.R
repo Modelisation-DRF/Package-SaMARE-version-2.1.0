@@ -1,9 +1,6 @@
-
-#' Vérifier la présence des colonnes obligatoires dans le fichier d'arbres
+#' Vérifie la présence des colonnes obligatoires dans le fichier d'arbres
 #'
-#' La fonction \code{trouver_noms_absents} vérifie si toutes les colonnes obligatoires
-#' sont présentes dans un dataframe représentant le fichier d'arbres. Elle retourne une liste
-#' des noms des colonnes manquantes, le cas échéant.
+#' \code{trouver_noms_absents} vérifie si toutes les colonnes obligatoires sont présentes dans un dataframe représentant le fichier d'arbres. Elle retourne une liste des noms des colonnes manquantes, le cas échéant.
 #'
 #' @param Data Un dataframe représentant le fichier d'arbres.
 #'
@@ -24,11 +21,27 @@
 #' }
 #'
 #' @export
-#'
 trouver_noms_absents <- function(Data) {
-
-  ColOrdre<-c("Placette","NoArbre","Espece","Etat","DHPcm","Vigueur","Nombre",
-              "Sup_PE","Annee_Coupe","Latitude","Longitude","Altitude","Pente","Reg_Eco","Type_Eco", "MSCR","ntrt","ABCD")
+  ColOrdre <- c(
+    "Placette",
+    "NoArbre",
+    "Espece",
+    "Etat",
+    "DHPcm",
+    "Vigueur",
+    "Nombre",
+    "Sup_PE",
+    "Annee_Coupe",
+    "Latitude",
+    "Longitude",
+    "Altitude",
+    "Pente",
+    "Reg_Eco",
+    "Type_Eco",
+    "MSCR",
+    "ntrt",
+    "ABCD"
+  )
 
   names(Data) <- tolower(names(Data))
 
@@ -37,14 +50,10 @@ trouver_noms_absents <- function(Data) {
   noms_absents <- setdiff(colone_minuscule, names(Data))
 
   return(noms_absents)
-
 }
 
-#' Vérifier la présence des colonnes obligatoires dans le fichier des gaules
-#'
-#' La fonction \code{trouver_noms_absents_gaules} vérifie si toutes les colonnes obligatoires
-#' sont présentes dans un dataframe représentant le fichier des gaules. Elle retourne une liste
-#' des noms des colonnes manquantes, le cas échéant.
+#' Vérifie la présence des colonnes obligatoires dans le fichier des gaules#'
+#' \code{trouver_noms_absents_gaules} vérifie si toutes les colonnes obligatoires sont présentes dans un dataframe représentant le fichier des gaules. Elle retourne une liste des noms des colonnes manquantes, le cas échéant.
 #'
 #' @param Data Un dataframe représentant le fichier des gaules.
 #'
@@ -64,8 +73,7 @@ trouver_noms_absents <- function(Data) {
 #'
 #' @export
 trouver_noms_absents_gaules <- function(Data) {
-
-  ColOrdre<-c("Placette","Espece","DHPcm","Nombre","Sup_PE")
+  ColOrdre <- c("Placette", "Espece", "DHPcm", "Nombre", "Sup_PE")
 
   names(Data) <- tolower(names(Data))
 
@@ -74,17 +82,12 @@ trouver_noms_absents_gaules <- function(Data) {
   noms_absents <- setdiff(colone_minuscule, names(Data))
 
   return(noms_absents)
-
 }
 
-
-
-#' Renommer les colonnes  du fichier des arbres
-#'
-#' La fonction \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
+#' Renomme les colonnes  du fichier des arbres#'
+#' \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
 #'
 #' @param data Un dataframe, représentant le fichier des arbres, dont les colonnes doivent être renommées et réorganisées.
-#'
 #'
 #' @details
 #' La fonction suit les étapes suivantes :
@@ -111,11 +114,30 @@ trouver_noms_absents_gaules <- function(Data) {
 #' }
 #'
 #' @export
-renommer_les_colonnes <- function(data){
-
-  ColOrdre<-c("Placette","NoArbre","Espece","Etat","DHPcm","Vigueur","Nombre",
-              "Sup_PE","Annee_Coupe","Latitude","Longitude","Altitude","Pente","Ptot","Tmoy",
-              "GrwDays","Reg_Eco","Type_Eco", "MSCR","ntrt","ABCD")
+renommer_les_colonnes <- function(data) {
+  ColOrdre <- c(
+    "Placette",
+    "NoArbre",
+    "Espece",
+    "Etat",
+    "DHPcm",
+    "Vigueur",
+    "Nombre",
+    "Sup_PE",
+    "Annee_Coupe",
+    "Latitude",
+    "Longitude",
+    "Altitude",
+    "Pente",
+    "Ptot",
+    "Tmoy",
+    "GrwDays",
+    "Reg_Eco",
+    "Type_Eco",
+    "MSCR",
+    "ntrt",
+    "ABCD"
+  )
 
   noms_colonnes_existants <- tolower(names(data))
   noms_colonnes_desires <- tolower(ColOrdre)
@@ -130,14 +152,10 @@ renommer_les_colonnes <- function(data){
   return(data)
 }
 
-
-
-#' Renommer les colonnes  du fichier des gaules
-#'
-#' La fonction \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
+#' Renomme les colonnes  du fichier des gaules
+#' \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
 #'
 #' @param data Un dataframe, représentant le fichier des gaules, dont les colonnes doivent être renommées et réorganisées.
-#'
 #'
 #' @details
 #' La fonction suit les étapes suivantes :
@@ -161,11 +179,8 @@ renommer_les_colonnes <- function(data){
 #' # Le dataframe data_renomme aura les colonnes renommées et réorganisées selon ColOrdre.
 #' }
 #' @export
-
-
-renommer_les_colonnes_gaules <- function(data){
-
-  ColOrdre<-c("Placette","Espece","GrEspece","DHPcm","Nombre","Sup_PE")
+renommer_les_colonnes_gaules <- function(data) {
+  ColOrdre <- c("Placette", "Espece", "GrEspece", "DHPcm", "Nombre", "Sup_PE")
 
   noms_colonnes_existants <- tolower(names(data))
   noms_colonnes_desires <- tolower(ColOrdre)
@@ -179,52 +194,3 @@ renommer_les_colonnes_gaules <- function(data){
 
   return(data)
 }
-
-
-
-
-
-
-
-
-# cppFunction('
-# #include <Rcpp.h>
-# #include <string>
-# #include <cctype>
-# #include <algorithm>
-#
-# using namespace Rcpp;
-#
-# // Helper function to convert a string to lowercase
-# std::string to_lower(std::string str) {
-#     std::transform(str.begin(), str.end(), str.begin(),
-#                    [](unsigned char c){ return std::tolower(c); });
-#     return str;
-# }
-#
-# // Main function to find missing column names
-# // [[Rcpp::export]]
-# CharacterVector trouver_noms_absents1(DataFrame Data) {
-#     CharacterVector ColOrdre = CharacterVector::create("Placette","NoArbre","Espece","Etat","DHPcm","Vigueur","Nombre",
-#                                                       "Sup_PE","Annee_Coupe","Latitude","Longitude","Altitude","Pente",
-#                                                       "Reg_Eco","Type_Eco", "MSCR","ntrt","ABCD");
-#
-#     // Convert ColOrdre to lowercase
-#     for (int i = 0; i < ColOrdre.size(); ++i) {
-#         ColOrdre[i] = to_lower(as<std::string>(ColOrdre[i]));
-#     }
-#
-#     // Extract names from Data and convert to lowercase
-#     CharacterVector dataNames = Data.names();
-#     for (int i = 0; i < dataNames.size(); ++i) {
-#         dataNames[i] = to_lower(as<std::string>(dataNames[i]));
-#     }
-#
-#     // Find missing names
-#     CharacterVector noms_absents = setdiff(ColOrdre, dataNames);
-#
-#     return noms_absents;
-# }
-# ')
-#
-
