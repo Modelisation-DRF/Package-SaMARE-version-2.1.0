@@ -21,7 +21,7 @@
 #' }
 #'
 #' @export
-SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
+SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, coreNumbers = 1) {
   # NbIter=2; Horizon=2; RecruesGaules=1; Data = Test400m2Coupe; Gaules = GaulesTest2500m2; MCH = 0;
   # NbIter=2; Horizon=2; RecruesGaules=0; Data = Test2500m2; Gaules = NULL; MCH = 0;
   select <- dplyr::select
@@ -139,18 +139,23 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
   # liste de placette/iter, donc on parallélise les placettes/iter
   list_plot <- unique(ListeIter$PlacetteID)
 
-  Simul <- bind_rows(
-    ###### utilisation de doRNG permet de controler la seed
-    foreach(x = list_plot) %dorng% {
-      SaMARE(
-        Random = RandPlacStep, RandomGaules = RandPlacStepGaules, Data = Data,
-        Gaules = Gaules, ListeIter = ListeIter[ListeIter$PlacetteID == x, ],
-        AnneeDep = AnneeDep, Horizon = Horizon, RecruesGaules = RecruesGaules, MCH = MCH,
-        CovParms = CovParms, CovParmsGaules = CovParmsGaules,
-        Para = Para, ParaGaules = ParaGaules, Omega = Omega, OmegaGaules = OmegaGaules
-      )
-    }
-  )
+  cluster1 <- makeCluster(coreNumbers)
+  registerDoParallel(cluster1)
+
+  ###### utilisation de doRNG permet de controler la seed
+  clusterResult <- foreach(x = list_plot) %dorng% {
+    SaMARE(
+      Random = RandPlacStep, RandomGaules = RandPlacStepGaules, Data = Data,
+      Gaules = Gaules, ListeIter = ListeIter[ListeIter$PlacetteID == x, ],
+      AnneeDep = AnneeDep, Horizon = Horizon, RecruesGaules = RecruesGaules, MCH = MCH,
+      CovParms = CovParms, CovParmsGaules = CovParmsGaules,
+      Para = Para, ParaGaules = ParaGaules, Omega = Omega, OmegaGaules = OmegaGaules
+    )
+  }
+
+  Simul <- bind_rows(clusterResult)
+
+  stopCluster(cluster1)
 
   #
   # plan(multisession) # Vous pouvez spécifier le nombre de workers si nécessaire, par exemple, plan(multisession, workers = 4)
