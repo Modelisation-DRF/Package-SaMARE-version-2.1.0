@@ -1,17 +1,17 @@
 #' Effectue la simulation de l'évolution des arbres d'une placette du simulateur SaMARE. Cette fonction effectue la simulation et appele chacune des fonction permettant de prévoir la mortalité, l'accroissement, le recrutement et l'évolution des paramètres de simulation.
 #'
 #' @param Random Un dataframe contenant des effets aléatoires à l'échelle de la placette et de la période de simulation pour les modules de SaMARE qui n'utilisent pas les gaules.
-#' @param RandomGaules  Un dataframe contenant des effets aléatoires à l'échelle de la placette et de la période de simulation pour les modules de SaMARE qui utilisent les gaules.
-#' @param Data    Un dataframe contenant une liste des arbres de dimenssion marchande d'une placette à simuler ainsi que des variables nécessaire à la simulation.
-#' @param Gaules  Un dataframe contenant la distribution du nombre de gaules par classe de diamètre et par groupe d'essence d'une placette à simuler ainsi que des variables nécessaire à la simulation.
+#' @param RandomGaules Un dataframe contenant des effets aléatoires à l'échelle de la placette et de la période de simulation pour les modules de SaMARE qui utilisent les gaules.
+#' @param Data Un dataframe contenant une liste des arbres de dimenssion marchande d'une placette à simuler ainsi que des variables nécessaire à la simulation.
+#' @param Gaules Un dataframe contenant la distribution du nombre de gaules par classe de diamètre et par groupe d'essence d'une placette à simuler ainsi que des variables nécessaire à la simulation.
 #' @param ListeIter Un dataframe contenant le numéro de la placette à simuler et le numéro de l'iteration à effecuer.
 #' @param AnneeDep Année de départ de la simulation.
 #' @param Horizon Nombre de pas de 5 ans de simulation à effectuer.
-#' @param RecruesGaules  Variable prenant la valeur de "1" pour utiliser les paramètres de recrutement basé sur l'inventaire des gaules de la placette et de "0" pour utiliser le module de recrutement basé sur les arbres de dimension marchande.
+#' @param RecruesGaules Variable prenant la valeur de "1" pour utiliser les paramètres de recrutement basé sur l'inventaire des gaules de la placette et de "0" pour utiliser le module de recrutement basé sur les arbres de dimension marchande.
 #' @param MCH Variable prenant la veleur de 1 en présence de maladie corticale du hêtre dans la placette et 0 lorsque la maladie est absente. Lorsque la maladie corticale est présente,la probabilité de mortalié des hêtres est estimée avec l'équation de l'avis technique AT-SSRF 20 de la Direction de la recherche forestière.
 #' @param CovParms Un dataframe contenant la variance des effets aléatoires des équations des modules de base de SaMARE (modules 1 à 9 et 17 à 19).
 #' @param CovParmsGaules Un dataframe contenant la variance des effets aléatoires des équations des modules de SaMARE basés sur l'information provenant des gaules (modules 10 à 16).
-#' @param Para  Un dataframe contenant les paramètres des modules de 1 à 9 et 17 à 19 (modules de base) de SaMARE.
+#' @param Para Un dataframe contenant les paramètres des modules de 1 à 9 et 17 à 19 (modules de base) de SaMARE.
 #' @param ParaGaules Un dataframe contenant les paramètres des modules 17à 19 (modules basés sur les gaules) de SaMARE.
 #' @param Omega Un dataframe contenant pour chaque module de base de SaMARE (modules 1 à 9 17 à 19) le éléments du triangle inférieur de la matrice de variance-covariance.
 #' @param OmegaGaules Un dataframe contenant pour chaque module basé sur les gaules de SaMARE (modules 10 à 16) les éléments du triangle inférieur de la matrice de variance-covariance.
@@ -84,8 +84,19 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     filter(Etat %in% c(10, 11, 12, 40, 42, 30, 32, 50, 52, 70, 71, 72)) %>%
     mutate(Etat = ifelse(Etat == 11, "martele", "vivant"), ArbreID = seq(1:n())) %>%
     select(
-      Placette, Annee, ArbreID, NoArbre, GrEspece, Espece, Etat,
-      DHPcm, Nombre, Vigueur, Iter, MSCR, ABCD
+      Placette,
+      Annee,
+      ArbreID,
+      NoArbre,
+      GrEspece,
+      Espece,
+      Etat,
+      DHPcm,
+      Nombre,
+      Vigueur,
+      Iter,
+      MSCR,
+      ABCD
     )
 
   ################### Calcul des parametres d'es'evolution de la qualite
@@ -119,8 +130,18 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     Para.EvolQualHEG3 <- ParaOmega(ModuleID = 3, ParaOri = ParaHEG, ParaIter = ParaHEG, Omega = OmegaHEG, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
 
     Para.EvolQual <- list(
-      Para.EvolQualBOJ1, Para.EvolQualBOJ2, Para.EvolQualBOJ3, Para.EvolQualERR1, Para.EvolQualERR2, Para.EvolQualERS1,
-      Para.EvolQualERS2, Para.EvolQualERS3, Para.EvolQualFEN1, Para.EvolQualFEN2, Para.EvolQualHEG1, Para.EvolQualHEG2,
+      Para.EvolQualBOJ1,
+      Para.EvolQualBOJ2,
+      Para.EvolQualBOJ3,
+      Para.EvolQualERR1,
+      Para.EvolQualERR2,
+      Para.EvolQualERS1,
+      Para.EvolQualERS2,
+      Para.EvolQualERS3,
+      Para.EvolQualFEN1,
+      Para.EvolQualFEN2,
+      Para.EvolQualHEG1,
+      Para.EvolQualHEG2,
       Para.EvolQualHEG3
     )
     Para.EvolQualTot <- c()
@@ -132,9 +153,30 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     }
 
     rm(
-      ParaBOJ, ParaERR, ParaERS, ParaFEN, ParaHEG, OmegaBOJ, OmegaERR, OmegaERS, OmegaFEN, OmegaHEG, Para.EvolQualBOJ1, Para.EvolQualBOJ2,
-      Para.EvolQualBOJ3, Para.EvolQualERR1, Para.EvolQualERR2, Para.EvolQualERS1, Para.EvolQualERS2, Para.EvolQualERS3, Para.EvolQualFEN1,
-      Para.EvolQualFEN2, Para.EvolQualHEG1, Para.EvolQualHEG2, Para.EvolQualHEG3, Para.EvolQual
+      ParaBOJ,
+      ParaERR,
+      ParaERS,
+      ParaFEN,
+      ParaHEG,
+      OmegaBOJ,
+      OmegaERR,
+      OmegaERS,
+      OmegaFEN,
+      OmegaHEG,
+      Para.EvolQualBOJ1,
+      Para.EvolQualBOJ2,
+      Para.EvolQualBOJ3,
+      Para.EvolQualERR1,
+      Para.EvolQualERR2,
+      Para.EvolQualERS1,
+      Para.EvolQualERS2,
+      Para.EvolQualERS3,
+      Para.EvolQualFEN1,
+      Para.EvolQualFEN2,
+      Para.EvolQualHEG1,
+      Para.EvolQualHEG2,
+      Para.EvolQualHEG3,
+      Para.EvolQual
     )
   }
 
@@ -168,15 +210,42 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     )
   )
 
+  # trt <- if ("martele" %in% Plac$Etat) {
+  #   "CP"
+  # } else if (
+  #   (is.na(PlacOri$ntrt[1]) == TRUE | PlacOri$ntrt[1] == 0) |
+  #   (AnneeDep - PlacOri$Annee_Coupe[1] < 5 & (sum((Plac$DHPcm / 200)^2 * 3.1416 * Plac$Nombre) / Sup_PE) > 26)
+  # ) {
+  #   "TEM"
+  # } else {
+  #   "CP"
+  # }
+
   # Nombre de traitements
   ntrt <- ifelse(trt == "CP" & "martele" %in% Plac$Etat, PlacOri$ntrt[1] + 1,
     ifelse(trt == "CP", PlacOri$ntrt[1], 0)
   )
 
+  # ntrt <- if (trt == "CP" & "martele" %in% Plac$Etat) {
+  #   PlacOri$ntrt[1] + 1
+  # } else if (trt == "CP") {
+  #   PlacOri$ntrt[1]
+  # } else {
+  #   0
+  # }
+
   # Type de placette
   type_pe_Plac <- ifelse(PlacOri$Sup_PE[1] == 0.04, "type0",
     ifelse(PlacOri$Sup_PE[1] >= 0.25 & PlacOri$Sup_PE[1] <= 0.5, "type1", "type2")
   )
+
+  # type_pe_Plac <- if (PlacOri$Sup_PE[1] == 0.04) {
+  #   "type0"
+  # } else if (PlacOri$Sup_PE[1] >= 0.25 & PlacOri$Sup_PE[1] <= 0.5) {
+  #   "type1"
+  # } else {
+  #   "type2"
+  # }
 
   # Variables de classification écologiques
   latitude <- PlacOri$Latitude[1]
@@ -228,8 +297,7 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     ################## Mise à jour des variable pour la période se simulation########
     # Si premier pas de simulation, on utilise le fichier de depart de la placette
     if (k == 1) {
-      Plac <- Plac %>%
-        mutate(Annee = AnneeDep + t)
+      Plac <- Plac %>% mutate(Annee = AnneeDep + t)
 
       ################## Atribution de vigueur et de produit##############
       ParaViglist <- list(Para.ConvMSCRVig)
@@ -558,21 +626,51 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
 
       ################## Mise à jour Nombre de gaules
       predNbGaules <- round(nb_Gaules(
-        Rec, RecGaules, t, st_tot0, altitude, latitude, trt, t0_aj_,
-        longitude, temp, pente, Iterj, RandomPlacGaules, Para.nb_gaules
+        Rec,
+        RecGaules,
+        t,
+        st_tot0,
+        altitude,
+        latitude,
+        trt,
+        t0_aj_,
+        longitude,
+        temp,
+        pente,
+        Iterj,
+        RandomPlacGaules,
+        Para.nb_gaules
       ))
 
       ################## Ratio Gaules
       Ratio <- data.frame("GrEspece" = c("AUT", "BOJ", "EPX", "ERR", "ERS", "FEN", "FIN", "HEG", "RES", "SAB"))
 
       Ratio$Pi <- ratio_pi_Gaules(
-        Ratio, Rec, RecGaules, t, st_tot0, latitude, longitude,
-        Iterj, RandomPlacGaules, Para.ratio_gaules
+        Ratio,
+        Rec,
+        RecGaules,
+        t,
+        st_tot0,
+        latitude,
+        longitude,
+        Iterj,
+        RandomPlacGaules,
+        Para.ratio_gaules
       )
 
       Ratio$Count <- ratio_count_Gaules(
-        Ratio, Rec, RecGaules, t, st_tot0, latitude, longitude,
-        prec, trt, t0_aj_, Iterj, RandomPlacGaules, Para.ratio_gaules
+        Ratio,
+        Rec,
+        RecGaules,
+        t, st_tot0,
+        latitude,
+        longitude,
+        prec,
+        trt,
+        t0_aj_,
+        Iterj,
+        RandomPlacGaules,
+        Para.ratio_gaules
       )
 
       Ratio <- Ratio %>%
@@ -678,12 +776,8 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
         vigu1, prod1, ABCD, Iter
       )
 
-    if (nrow(Plac) == 0) {
-      break
-    }
-
     ###### Arrete simulation et écris les valeurs dans un fichier log
-    if (nrow(Plac[which(Plac$Etat1 == "vivant"), ]) == 0) {
+    if (nrow(Plac) == 0 | nrow(Plac[which(Plac$Etat1 == "vivant"), ]) == 0) {
       break
     }
 
