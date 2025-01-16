@@ -11,20 +11,19 @@
 #' @return Retourne un dataframe avec le no de l'arbre et sa classe de qualité prédite
 #' @export
 #'
-AttribQualFct<-function(PlacSansQual,rid1){
-
-  PlacSansQual$rid1<-rid1
-  Alea_n=runif(n=nrow(PlacSansQual))
+AttribQualFct <- function(PlacSansQual, rid1) {
+  PlacSansQual$rid1 <- rid1
+  Alea_n <- runif(n = nrow(PlacSansQual))
   suppressMessages(
-  PlacSansQualForm<-PlacSansQual %>%
-                    inner_join(AttribQual,relationship = "many-to-many"))
+    PlacSansQualForm <- PlacSansQual %>%
+      inner_join(AttribQual, relationship = "many-to-many")
+  )
 
-  PlacSansQualForm$Alea<-Alea_n
+  PlacSansQualForm$Alea <- Alea_n
 
-  PlacSansQualForm<-PlacSansQualForm %>%
-                    mutate(PredQual=ifelse(Alea<=ProbQualC,"C","D")) %>%
-                    select(ArbreID,PredQual)
+  PlacSansQualForm <- PlacSansQualForm %>%
+    mutate(PredQual = ifelse(Alea <= ProbQualC, "C", "D")) %>%
+    select(ArbreID, PredQual)
 
-  return ( PlacSansQualForm)
-
+  return(PlacSansQualForm)
 }

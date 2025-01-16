@@ -13,33 +13,31 @@
 #' @return Retourne une probabilité d'absence de gaules de 6 et 8 cm de DHP de hêtre à grande feuille
 #' @export
 
-pi68HEG<-function(RecGaules,Ratio,Rec,Iterj,RandomPlacGaules,Para.68_HEG){
-
-  select=dplyr::select
+pi68HEG <- function(RecGaules, Ratio, Rec, Iterj, RandomPlacGaules, Para.68_HEG) {
+  select <- dplyr::select
 
   # Construction matrice X
-  X68HEG_pi<-matrix(0,ncol=3,nrow=1)
-  X68HEG_pi[,1]<-1
-  X68HEG_pi[,2]<-RecGaules$lnNb_Gaules_Ess_Ha[which(RecGaules$GrEspece=="HEG")]
-  X68HEG_pi[,3]<-RecGaules$lnNb_Gaules_68_Ess_Ha[which(RecGaules$GrEspece=="HEG")]
+  X68HEG_pi <- matrix(0, ncol = 3, nrow = 1)
+  X68HEG_pi[, 1] <- 1
+  X68HEG_pi[, 2] <- RecGaules$lnNb_Gaules_Ess_Ha[which(RecGaules$GrEspece == "HEG")]
+  X68HEG_pi[, 3] <- RecGaules$lnNb_Gaules_68_Ess_Ha[which(RecGaules$GrEspece == "HEG")]
 
 
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  Para68HEG_pi<-Para.68_HEG %>%
-              filter(Iter==Iterj & response=="pi")
+  Para68HEG_pi <- Para.68_HEG %>%
+    filter(Iter == Iterj & response == "pi")
   # Construction matrice beta
-  BetaMat<-matrix(Para68HEG_pi$ParameterEstimate,ncol=1)
+  BetaMat <- matrix(Para68HEG_pi$ParameterEstimate, ncol = 1)
 
   # Calcul
-  logit <-X68HEG_pi %*% BetaMat
+  logit <- X68HEG_pi %*% BetaMat
 
-  Random<-RandomPlacGaules$RandomPlac[which(RandomPlacGaules$SubModuleID==14 & RandomPlacGaules$response=="pi")]
+  Random <- RandomPlacGaules$RandomPlac[which(RandomPlacGaules$SubModuleID == 14 & RandomPlacGaules$response == "pi")]
 
-  pred<-1/(1+exp(-(logit+Random)))
+  pred <- 1 / (1 + exp(-(logit + Random)))
 
   return(pred)
-
 }
 
 #' Fonction qui calcul le nombre de Gaules de hêtre à grandes feuilles classes de 6 ou 8 cm de diamètre lorsquelle sont présente.
@@ -57,32 +55,29 @@ pi68HEG<-function(RecGaules,Ratio,Rec,Iterj,RandomPlacGaules,Para.68_HEG){
 #' @export
 
 
-count68HEG<-function(RecGaules,Ratio,Rec,Iterj,RandomPlacGaules,Para.68_HEG){
-
-
+count68HEG <- function(RecGaules, Ratio, Rec, Iterj, RandomPlacGaules, Para.68_HEG) {
   # Construction matrice X
-  X68HEG_count<-matrix(0,ncol=3,nrow=1)
-  X68HEG_count[,1]<-1
-  X68HEG_count[,2]<-RecGaules$lnNb_Gaules_68_Ess_Ha[which(RecGaules$GrEspece=="HEG")]
-  X68HEG_count[,3]<-RecGaules$lnNb_Gaules_24_Ess_Ha[which(RecGaules$GrEspece=="HEG")]
+  X68HEG_count <- matrix(0, ncol = 3, nrow = 1)
+  X68HEG_count[, 1] <- 1
+  X68HEG_count[, 2] <- RecGaules$lnNb_Gaules_68_Ess_Ha[which(RecGaules$GrEspece == "HEG")]
+  X68HEG_count[, 3] <- RecGaules$lnNb_Gaules_24_Ess_Ha[which(RecGaules$GrEspece == "HEG")]
 
 
 
 
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  Para68HEG_count<-Para.68_HEG %>%
-                   filter(Iter==Iterj & response=="count")
+  Para68HEG_count <- Para.68_HEG %>%
+    filter(Iter == Iterj & response == "count")
   # Construction matrice beta
-  BetaMat<-matrix(Para68HEG_count$ParameterEstimate,ncol=1)
+  BetaMat <- matrix(Para68HEG_count$ParameterEstimate, ncol = 1)
 
   # Calcul
-  logit <-X68HEG_count %*% BetaMat
+  logit <- X68HEG_count %*% BetaMat
 
-  Random<-RandomPlacGaules$RandomPlac[which(RandomPlacGaules$SubModuleID==14 & RandomPlacGaules$response=="count")]
+  Random <- RandomPlacGaules$RandomPlac[which(RandomPlacGaules$SubModuleID == 14 & RandomPlacGaules$response == "count")]
 
-  pred<-exp(logit+Random)
+  pred <- exp(logit + Random)
 
   return(pred)
-
 }

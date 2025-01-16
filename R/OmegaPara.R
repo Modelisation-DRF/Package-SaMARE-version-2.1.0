@@ -9,20 +9,19 @@
 #'
 
 reconstruct <- function(m_lower, diag = TRUE, symmetric = TRUE) {
+  select <- dplyr::select
 
-  select=dplyr::select
-
-               l <- length(m_lower)
-               n <- (sqrt(1 + 8*l) + ifelse(diag, -1, 1))/2  # Solve n*(n + 1) = l for n
-               m <- matrix(NA, n, n)
+  l <- length(m_lower)
+  n <- (sqrt(1 + 8 * l) + ifelse(diag, -1, 1)) / 2 # Solve n*(n + 1) = l for n
+  m <- matrix(NA, n, n)
 
   # Reconstruct
-              m[t(lower.tri(m, diag = diag))] <- m_lower
-              m<-t(m)
-              if (symmetric) { # If symmetric, fill also upper half
-              m[upper.tri(m)] <- t(m)[upper.tri(m)]
-              }
-               return(m)
+  m[t(lower.tri(m, diag = diag))] <- m_lower
+  m <- t(m)
+  if (symmetric) { # If symmetric, fill also upper half
+    m[upper.tri(m)] <- t(m)[upper.tri(m)]
+  }
+  return(m)
 }
 #' Fonction qui ajuste les paramètre des chaque itération en fonction de leur
 #' variance-covariance.
@@ -36,29 +35,34 @@ reconstruct <- function(m_lower, diag = TRUE, symmetric = TRUE) {
 #' @export
 #'
 #'
-ParaOmega<-function(ModuleID,ParaOri,ParaIter,Omega,NbIter){
-  select=dplyr::select
-          OmegaMod<-Omega %>% filter(SubModuleID==ModuleID) %>% .$ParameterEstimate
+ParaOmega <- function(ModuleID, ParaOri, ParaIter, Omega, NbIter) {
+  select <- dplyr::select
+  OmegaMod <- Omega %>%
+    filter(SubModuleID == ModuleID) %>%
+    .$ParameterEstimate
 
-          OmegaMat<-reconstruct(OmegaMod,diag = TRUE, symmetric = TRUE)
+  OmegaMat <- reconstruct(OmegaMod, diag = TRUE, symmetric = TRUE)
 
-          ParaMod<-ParaOri %>% filter(SubModuleID==ModuleID &ParameterEstimate!=0) %>% .$ParameterEstimate
+  ParaMod <- ParaOri %>%
+    filter(SubModuleID == ModuleID & ParameterEstimate != 0) %>%
+    .$ParameterEstimate
 
 
-          beta<-rmvnorm(n=NbIter, mean=ParaMod, sigma=OmegaMat, method="chol")
-          beta<-as.vector(t(beta))
+  beta <- rmvnorm(n = NbIter, mean = ParaMod, sigma = OmegaMat, method = "chol")
+  beta <- as.vector(t(beta))
 
-          ParaMod<-ParaIter %>%
-                    filter(SubModuleID==ModuleID)
+  ParaMod <- ParaIter %>%
+    filter(SubModuleID == ModuleID)
 
-           ParaModSans0<-ParaMod %>%
-                         filter(ParameterEstimate!=0) %>%
-                         select(-ParameterEstimate)%>%
-                         dplyr::mutate(ParaRandom=beta)
-           suppressMessages(
-           ParaMod<-left_join(ParaMod,ParaModSans0) %>%
-                    mutate(ParameterEstimate=ifelse(is.na(ParaRandom==TRUE),ParameterEstimate,ParaRandom)) %>%
-                  select(-ParaRandom))
+  ParaModSans0 <- ParaMod %>%
+    filter(ParameterEstimate != 0) %>%
+    select(-ParameterEstimate) %>%
+    dplyr::mutate(ParaRandom = beta)
+  suppressMessages(
+    ParaMod <- left_join(ParaMod, ParaModSans0) %>%
+      mutate(ParameterEstimate = ifelse(is.na(ParaRandom == TRUE), ParameterEstimate, ParaRandom)) %>%
+      select(-ParaRandom)
+  )
 }
 
 
@@ -98,8 +102,3 @@ ParaOmega<-function(ModuleID,ParaOri,ParaIter,Omega,NbIter){
 # }
 #
 # ')
-
-
-
-
-

@@ -51,20 +51,20 @@ saveRDS(Result_rec_delta_for_test, "tests/testthat/fixtures/Result_rec_delta_for
 saveRDS(Result_Recrutement_Dhp_test, "tests/testthat/fixtures/Result_Recrutement_Dhp_test.rds")
 
 
-#Fichiers pour tests sorties Arbre SaMARE
-#expect_for_sortie_arbre_samare_test<-SortieArbreSamare(expect_for_Simulateur_Samare_sans_gaules_et_coupe_test)
+# Fichiers pour tests sorties Arbre SaMARE
+# expect_for_sortie_arbre_samare_test<-SortieArbreSamare(expect_for_Simulateur_Samare_sans_gaules_et_coupe_test)
 saveRDS(expect_for_sortie_arbre_samare_test, "tests/testthat/fixtures/expect_for_sortie_arbre_samare_test.rds")
 
-#Fichiers pour tests Sommaire classe DHP SaMARE
-#expect_for_arbre_sommaire_classes_DHP<- Sommaire_Classes_DHP(expect_for_Simulateur_Samare_sans_gaules_et_coupe_test)
+# Fichiers pour tests Sommaire classe DHP SaMARE
+# expect_for_arbre_sommaire_classes_DHP<- Sommaire_Classes_DHP(expect_for_Simulateur_Samare_sans_gaules_et_coupe_test)
 saveRDS(expect_for_arbre_sommaire_classes_DHP, "tests/testthat/fixtures/expect_for_arbre_sommaire_classes_DHP.rds")
 
-#Fichiers pour tests Sommaire DendroIter  SaMARE
-#expect_for_sortie_dendroIter_samare_test<- SortieDendroIterSamare(expect_for_Simulateur_Samare_sans_gaules_et_coupe_test)
+# Fichiers pour tests Sommaire DendroIter  SaMARE
+# expect_for_sortie_dendroIter_samare_test<- SortieDendroIterSamare(expect_for_Simulateur_Samare_sans_gaules_et_coupe_test)
 saveRDS(expect_for_sortie_dendroIter_samare_test, "tests/testthat/fixtures/expect_for_sortie_dendroIter_samare_test.rds")
 
-#Fichiers pour tests Sommaire Dendro  SaMARE
-#expect_for_sortie_dendro_samare_test<- SortieDendroSamare(expect_for_Simulateur_Samare_sans_gaules_et_coupe_test)
+# Fichiers pour tests Sommaire Dendro  SaMARE
+# expect_for_sortie_dendro_samare_test<- SortieDendroSamare(expect_for_Simulateur_Samare_sans_gaules_et_coupe_test)
 saveRDS(expect_for_sortie_dendro_samare_test, "tests/testthat/fixtures/expect_for_sortie_dendro_samare_test.rds")
 
 
@@ -73,4 +73,3 @@ saveRDS(expect_for_sortie_dendro_samare_test, "tests/testthat/fixtures/expect_fo
 saveRDS(result_simul_gaules_test, "tests/testthat/fixtures/result_simul_gaules_test.rds")
 saveRDS(result_simul_test, "tests/testthat/fixtures/result_simul_test.rds")
 saveRDS(Test_Simul, "tests/testthat/fixtures/Test_Simul.rds")
-

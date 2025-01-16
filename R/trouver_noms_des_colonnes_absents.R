@@ -1,4 +1,3 @@
-
 #' Vérifier la présence des colonnes obligatoires dans le fichier d'arbres
 #'
 #' La fonction \code{trouver_noms_absents} vérifie si toutes les colonnes obligatoires
@@ -26,9 +25,10 @@
 #' @export
 #'
 trouver_noms_absents <- function(Data) {
-
-  ColOrdre<-c("Placette","NoArbre","Espece","Etat","DHPcm","Vigueur","Nombre",
-              "Sup_PE","Annee_Coupe","Latitude","Longitude","Altitude","Pente","Reg_Eco","Type_Eco", "MSCR","ntrt","ABCD")
+  ColOrdre <- c(
+    "Placette", "NoArbre", "Espece", "Etat", "DHPcm", "Vigueur", "Nombre",
+    "Sup_PE", "Annee_Coupe", "Latitude", "Longitude", "Altitude", "Pente", "Reg_Eco", "Type_Eco", "MSCR", "ntrt", "ABCD"
+  )
 
   names(Data) <- tolower(names(Data))
 
@@ -37,7 +37,6 @@ trouver_noms_absents <- function(Data) {
   noms_absents <- setdiff(colone_minuscule, names(Data))
 
   return(noms_absents)
-
 }
 
 #' Vérifier la présence des colonnes obligatoires dans le fichier des gaules
@@ -64,8 +63,7 @@ trouver_noms_absents <- function(Data) {
 #'
 #' @export
 trouver_noms_absents_gaules <- function(Data) {
-
-  ColOrdre<-c("Placette","Espece","DHPcm","Nombre","Sup_PE")
+  ColOrdre <- c("Placette", "Espece", "DHPcm", "Nombre", "Sup_PE")
 
   names(Data) <- tolower(names(Data))
 
@@ -74,7 +72,6 @@ trouver_noms_absents_gaules <- function(Data) {
   noms_absents <- setdiff(colone_minuscule, names(Data))
 
   return(noms_absents)
-
 }
 
 
@@ -111,11 +108,12 @@ trouver_noms_absents_gaules <- function(Data) {
 #' }
 #'
 #' @export
-renommer_les_colonnes <- function(data){
-
-  ColOrdre<-c("Placette","NoArbre","Espece","Etat","DHPcm","Vigueur","Nombre",
-              "Sup_PE","Annee_Coupe","Latitude","Longitude","Altitude","Pente","Ptot","Tmoy",
-              "GrwDays","Reg_Eco","Type_Eco", "MSCR","ntrt","ABCD")
+renommer_les_colonnes <- function(data) {
+  ColOrdre <- c(
+    "Placette", "NoArbre", "Espece", "Etat", "DHPcm", "Vigueur", "Nombre",
+    "Sup_PE", "Annee_Coupe", "Latitude", "Longitude", "Altitude", "Pente", "Ptot", "Tmoy",
+    "GrwDays", "Reg_Eco", "Type_Eco", "MSCR", "ntrt", "ABCD"
+  )
 
   noms_colonnes_existants <- tolower(names(data))
   noms_colonnes_desires <- tolower(ColOrdre)
@@ -163,9 +161,8 @@ renommer_les_colonnes <- function(data){
 #' @export
 
 
-renommer_les_colonnes_gaules <- function(data){
-
-  ColOrdre<-c("Placette","Espece","GrEspece","DHPcm","Nombre","Sup_PE")
+renommer_les_colonnes_gaules <- function(data) {
+  ColOrdre <- c("Placette", "Espece", "GrEspece", "DHPcm", "Nombre", "Sup_PE")
 
   noms_colonnes_existants <- tolower(names(data))
   noms_colonnes_desires <- tolower(ColOrdre)
@@ -227,4 +224,3 @@ renommer_les_colonnes_gaules <- function(data){
 # }
 # ')
 #
-

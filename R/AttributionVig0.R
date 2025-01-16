@@ -12,50 +12,47 @@
 #' @export
 #'
 
-AttribVigu0<-function(Data,Para.ConvMSCRVig){
-  select=dplyr::select
+AttribVigu0 <- function(Data, Para.ConvMSCRVig) {
+  select <- dplyr::select
 
-  if (is.na(Data$Vigueur)==FALSE){
+  if (is.na(Data$Vigueur) == FALSE) {
+    vigu0 <- ifelse(Data$Vigueur %in% c(1, 2, 5), "ViG", "NONVIG")
+  } else {
+    if (is.na(Data$MSCR) == FALSE) {
+      n <- nrow(Data)
 
-    vigu0<-ifelse(Data$Vigueur %in% c(1,2,5),"ViG","NONVIG")
+      Data$GrEspeceMSCR <- ifelse(Data$GrEspece == "AUT", "FIN", ifelse(
+        Data$GrEspece == "EPX", "RES", Data$GrEspece
+      ))
 
-  }else{
+      listeMSCR <- c(rep("R", n), rep("C", n), rep("S", n), rep("M", n), rep("CR", n), rep("MS", n))
+      listeEss <- c(
+        rep("BOJ", n), rep("ERR", n), rep("ERS", n), rep("FEN", n), rep("FIN", n),
+        rep("HEG", n), rep("RES", n), rep("SAB", n)
+      )
 
-    if (is.na(Data$MSCR)==FALSE){
+      # Construction matrice X
+      XConvMSCRVig <- matrix(0, ncol = 16, nrow = n)
+      XConvMSCRVig[, 1] <- 1
+      XConvMSCRVig[, 2:7] <- (Data$MSCR == listeMSCR) * 1
+      XConvMSCRVig[, 8:15] <- (Data$GrEspeceMSCR == listeEss) * 1
+      XConvMSCRVig[, 16] <- Data$DHPcm
 
-  n<-nrow(Data)
+      # selectionner les parametres de conversion en vigeur
+      Para.ConvMSCRVig <- Para.ConvMSCRVig
 
-  Data$GrEspeceMSCR<-ifelse(Data$GrEspece=="AUT","FIN",ifelse(
-                            Data$GrEspece=="EPX","RES",Data$GrEspece))
+      # Construction matrice beta
+      BetaMat <- matrix(Para.ConvMSCRVig$ParameterEstimate, ncol = 1)
 
-  listeMSCR<-c(rep("R",n),rep("C",n),rep("S",n),rep("M",n),rep("CR",n),rep("MS",n))
-  listeEss<-c(rep("BOJ",n),rep("ERR",n),rep("ERS",n),rep("FEN",n),rep("FIN",n),
-              rep("HEG",n),rep("RES",n),rep("SAB",n))
-
-  # Construction matrice X
-  XConvMSCRVig<-matrix(0,ncol=16,nrow=n)
-  XConvMSCRVig[,1]<-1
-  XConvMSCRVig[,2:7]<-(Data$MSCR==listeMSCR)*1
-  XConvMSCRVig[,8:15]<-(Data$GrEspeceMSCR==listeEss)*1
-  XConvMSCRVig[,16]<-Data$DHPcm
-
-  # selectionner les parametres de conversion en vigeur
-  Para.ConvMSCRVig<-Para.ConvMSCRVig
-
-  # Construction matrice beta
-  BetaMat<-matrix(Para.ConvMSCRVig$ParameterEstimate,ncol=1)
-
-  # Calcul
-  logit <-as.vector(XConvMSCRVig %*% BetaMat)
+      # Calcul
+      logit <- as.vector(XConvMSCRVig %*% BetaMat)
 
 
-  pred<-exp(logit)/(1+exp(logit))
+      pred <- exp(logit) / (1 + exp(logit))
 
- vigu0<-ifelse(pred>=runif(n=1),"ViG","NONVIG")
-
-    }else{
-  vigu0="ViG"
-
+      vigu0 <- ifelse(pred >= runif(n = 1), "ViG", "NONVIG")
+    } else {
+      vigu0 <- "ViG"
     }
   }
   return(vigu0)

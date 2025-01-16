@@ -50,7 +50,9 @@ initiales ainsi qu'un choix de paramètres pour la simulation.
 # Simulation sur 10 ans, recrutement de base
 result <- SimulSaMARE(NbIter = 10, Horizon = 2, RecruesGaules = 0, Data = Test2500m2)
 # Simulation sur 10 ans, recrutement avec les gaules
-result <- SimulSaMARE(NbIter = 10, Horizon = 2, RecruesGaules = 1, Data = Test2500m2,
-Gaules=GaulesTest2500m2)
+result <- SimulSaMARE(
+  NbIter = 10, Horizon = 2, RecruesGaules = 1, Data = Test2500m2,
+  Gaules = GaulesTest2500m2
+)
 }
 }
