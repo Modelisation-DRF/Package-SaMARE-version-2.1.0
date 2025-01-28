@@ -269,6 +269,7 @@ SimulSaMARE<-function(NbIter,Horizon,RecruesGaules,Data,Gaules ,MCH=0){
     rename(Placette=id_pe, DHPcm=dhpcm,ArbreID=no_arbre,                #IA : j'ai enlevé GrEspece=essence
            Altitude=altitude,Ptot=p_tot,Tmoy=t_ma, Iter=iter) %>%
     mutate(PlacetteID=paste(Placette,"_",Iter, sep="")) %>%
+    mutate(vol_dm3=ifelse(Espece %in% c("AME","AUR","ERE","ERG","ERP","MAS","PRP","SAL","SOA","SOD"),NA,vol_dm3)) %>%
     dplyr::select(-milieu, -veg_pot, -essence_hauteur, -essence_volume, -step, -nb_tige) # enlever les variables qui étaient nécessaire seulement pour tarifqc
 
 
