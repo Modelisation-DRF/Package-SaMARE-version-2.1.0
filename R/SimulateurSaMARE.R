@@ -95,7 +95,7 @@ SimulSaMARE<-function(NbIter,Horizon,RecruesGaules,Data,Gaules ,MCH=0){
   # Fichier des arbres
   ColOrdre<-c("Placette","NoArbre","Espece","GrEspece","Etat","DHPcm","Vigueur","Nombre",
               "Sup_PE","Annee_Coupe","Latitude","Longitude","Altitude","Pente","Ptot","Tmoy",
-              "GrwDays","Reg_Eco","Type_Eco", "MSCR","ntrt","ABCD", "AnneeDep")
+              "GrwDays","Reg_Eco","Type_Eco", "MSCR","ntrt","ABCD", "Annee_Inventaire")
 
   Data<-Data %>%
     left_join(ListeSp, by="Espece")
@@ -162,7 +162,7 @@ SimulSaMARE<-function(NbIter,Horizon,RecruesGaules,Data,Gaules ,MCH=0){
     foreach(x = list_plot , y=list_annedep) %dorng%   ######utilisation de doRNG permet de controler la seed
       {SaMARE(Random=RandPlacStep,RandomGaules=RandPlacStepGaules,Data=Data,
               Gaules=Gaules, ListeIter=ListeIter[ListeIter$PlacetteID==x,],
-              AnneeDep= unique(Data$AnneeDep[Data$Placette == y]),Horizon=Horizon,RecruesGaules=RecruesGaules, MCH=MCH,
+              Annee_Inventaire= unique(Data$Annee_Inventaire[Data$Placette == y]),Horizon=Horizon,RecruesGaules=RecruesGaules, MCH=MCH,
               CovParms=CovParms,CovParmsGaules=CovParmsGaules,
               Para=Para,ParaGaules=ParaGaules,Omega=Omega, OmegaGaules=OmegaGaules)}
   )

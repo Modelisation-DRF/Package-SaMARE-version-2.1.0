@@ -18,7 +18,7 @@
 #'                simuler ainsi que des variables nécessaire à la simulation.
 #' @param ListeIter Un dataframe contenant le numéro de la placette à simuler
 #'                  et le numéro de l'iteration à effecuer.
-#' @param AnneeDep Année de départ de la simulation.
+#' @param Annee_Inventaire Année de départ de la simulation.
 #' @param Horizon Nombre de pas de 5 ans de simulation à effectuer.
 #' @param RecruesGaules  Variable prenant la valeur de "1" pour utiliser les
 #'                       paramètres de recrutement basé sur l'inventaire des gaules
@@ -47,7 +47,7 @@
 #'        leur DHP pour chaque étape de 5 ans de l'horizon de simulation.
 #' @export
 
-SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horizon, RecruesGaules,
+SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventaire, Horizon, RecruesGaules,
                   MCH,CovParms,CovParmsGaules,Para,ParaGaules,Omega,OmegaGaules){
 
 
@@ -71,7 +71,7 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horiz
 
   PlacOri <- Data %>%
     filter(Placette==ListeIter$Placette) %>%
-    mutate(Annee = AnneeDep, Iter=ListeIter$Iter)
+    mutate(Annee = Annee_Inventaire, Iter=ListeIter$Iter)
 
   #########Creation paramètres
 
@@ -207,7 +207,7 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horiz
   #Variable du peuplement residuel avec condition que si St >26 = TEM
   trt<-ifelse("martele" %in% Plac$Etat,"CP",
               ifelse((is.na(PlacOri$ntrt[1])==TRUE | PlacOri$ntrt[1]==0),"TEM",
-                     ifelse(AnneeDep-PlacOri$Annee_Coupe[1]<5 &
+                     ifelse(Annee_Inventaire-PlacOri$Annee_Coupe[1]<5 &
                               (sum((Plac$DHPcm/200)^2*3.1416*Plac$Nombre)/Sup_PE)>26,"TEM","CP")))
 
   #Nombre de traitements
@@ -281,7 +281,7 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horiz
     if   (k==1){
 
       Plac <- Plac %>%
-        mutate(Annee=AnneeDep+t)
+        mutate(Annee=Annee_Inventaire+t)
 
       ##################Atribution de vigueur et de produit##############
 
@@ -315,7 +315,7 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horiz
       ########Dataframe avec les conditions initiales de la placette##############
 
       outputInitial<-Plac %>%
-        mutate(Annee=AnneeDep,Residuel=0) %>%
+        mutate(Annee=Annee_Inventaire,Residuel=0) %>%
         select(Placette, Annee, ArbreID, NoArbre, Nombre, GrEspece,
                Espece, Etat, DHPcm, vigu0, prod0, ABCD, MSCR, Residuel, Iter)
 
@@ -325,7 +325,7 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horiz
 
         outputInitial<-Plac %>%
           filter(Etat=="vivant") %>%
-          mutate(Annee=AnneeDep,Residuel=1) %>%
+          mutate(Annee=Annee_Inventaire,Residuel=1) %>%
           select(Placette, Annee, ArbreID, NoArbre, Nombre, GrEspece,
                  Espece, Etat, DHPcm, vigu0, prod0, ABCD, MSCR, Residuel, Iter) %>%
           rbind(outputInitial,.)
@@ -334,7 +334,7 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horiz
           filter(Etat=="vivant") %>%
           select(-MSCR)
 
-        t0=AnneeDep
+        t0=Annee_Inventaire
 
       }
 
@@ -381,8 +381,8 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horiz
     }  else {    # Si 2e pas de simulation ou plus, on prend le fichier qui contient les simulations et on garde seulement le dernier pas
 
       Plac <- outputTot %>%
-        filter(Annee == AnneeDep+(k-1)*t & Etat!="mort") %>%
-        mutate(Annee=AnneeDep+k*t, Etat="vivant")
+        filter(Annee == Annee_Inventaire+(k-1)*t & Etat!="mort") %>%
+        mutate(Annee=Annee_Inventaire+k*t, Etat="vivant")
 
     }
 
@@ -790,7 +790,7 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horiz
       }
       ########Ajout des recrues au fichier des Placettes
       RecSelect<-RecSelect %>%
-        mutate(Placette=Placette,Annee=AnneeDep+k*t,NoArbre=NA,
+        mutate(Placette=Placette,Annee=Annee_Inventaire+k*t,NoArbre=NA,
                Espece=ifelse(GrEspece %in% c("BOJ","ERR","ERS","HEG","SAB"),GrEspece,NA),
                Etat1="recrue", Nombre=Sup_PE/0.25, Iter=PlacOri$Iter[1])
 
