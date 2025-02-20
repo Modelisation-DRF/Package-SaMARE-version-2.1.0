@@ -8,51 +8,51 @@
 # Puis utiliser la ligne de code suivant (toujours dans le projet du package)
 # usethis::use_data(param_tarif, param_ht, internal=TRUE): ça fonctionne seulement si le projet est un package
 
-#library(readxl)
-#library(sas7bdat)
+# library(readxl)
+# library(sas7bdat)
 
 
-#write_delim(MatchModuleCovparms, "data_raw\\Parametre_Samare\\MatchModuleCovparms.csv", delim = ';')
-MatchModuleCovparms <- read_delim("data-raw\\Parametre_Samare\\MatchModuleCovparms.csv", delim = ';')
+# write_delim(MatchModuleCovparms, "data_raw\\Parametre_Samare\\MatchModuleCovparms.csv", delim = ';')
+MatchModuleCovparms <- fread("data-raw\\Parametre_Samare\\MatchModuleCovparms.csv")
 
-#write_delim(AttribQual, "data_raw\\Parametre_Samare\\AttribQual.csv", delim = ';')
-AttribQual <- read_delim("data-raw\\Parametre_Samare\\AttribQual.csv", delim = ';')
+# write_delim(AttribQual, "data_raw\\Parametre_Samare\\AttribQual.csv", delim = ';')
+AttribQual <- fread("data-raw\\Parametre_Samare\\AttribQual.csv")
 
-#write_delim(EffetCovParms, "data_raw\\Parametre_Samare\\EffetCovParms.csv", delim = ';')
-EffetCovParms <- read_delim("data-raw\\Parametre_Samare\\EffetCovParms.csv", delim = ';')
+# write_delim(EffetCovParms, "data_raw\\Parametre_Samare\\EffetCovParms.csv", delim = ';')
+EffetCovParms <- fread("data-raw\\Parametre_Samare\\EffetCovParms.csv")
 
-#write_delim(MatchModuleOmega, "data_raw\\Parametre_Samare\\MatchModuleOmega.csv", delim = ';')
-MatchModuleOmega <- read_delim("data-raw\\Parametre_Samare\\MatchModuleOmega.csv", delim = ';')
+# write_delim(MatchModuleOmega, "data_raw\\Parametre_Samare\\MatchModuleOmega.csv", delim = ';')
+MatchModuleOmega <- fread("data-raw\\Parametre_Samare\\MatchModuleOmega.csv")
 
-#write_delim(MatchModuleParameters, "data_raw\\Parametre_Samare\\MatchModuleParameters.csv", delim = ';')
-MatchModuleParameters <- read_delim("data-raw\\Parametre_Samare\\MatchModuleParameters.csv", delim = ';')
+# write_delim(MatchModuleParameters, "data_raw\\Parametre_Samare\\MatchModuleParameters.csv", delim = ';')
+MatchModuleParameters <- fread("data-raw\\Parametre_Samare\\MatchModuleParameters.csv")
 
-#write_delim(OmegaEvolQual, "data_raw\\Parametre_Samare\\OmegaEvolQual.csv", delim = ';')
-OmegaEvolQual <- read_delim("data-raw\\Parametre_Samare\\OmegaEvolQual.csv", delim = ';')
+# write_delim(OmegaEvolQual, "data_raw\\Parametre_Samare\\OmegaEvolQual.csv", delim = ';')
+OmegaEvolQual <- fread("data-raw\\Parametre_Samare\\OmegaEvolQual.csv")
 
-#write_delim(OmegaGaulesFormat, "data_raw\\Parametre_Samare\\OmegaGaulesFormat.csv", delim = ';')
-OmegaGaulesFormat <- read_delim("data-raw\\Parametre_Samare\\OmegaGaulesFormat.csv", delim = ';')
+# write_delim(OmegaGaulesFormat, "data_raw\\Parametre_Samare\\OmegaGaulesFormat.csv", delim = ';')
+OmegaGaulesFormat <- fread("data-raw\\Parametre_Samare\\OmegaGaulesFormat.csv")
 
-#write_delim(ParametresEvolQual, "data_raw\\Parametre_Samare\\ParametresEvolQual.csv", delim = ';')
-ParametresEvolQual <- read_delim("data-raw\\Parametre_Samare\\ParametresEvolQual.csv", delim = ';')
+# write_delim(ParametresEvolQual, "data_raw\\Parametre_Samare\\ParametresEvolQual.csv", delim = ';')
+ParametresEvolQual <- fread("data-raw\\Parametre_Samare\\ParametresEvolQual.csv")
 
-#write_delim(ParametresGaules, "data_raw\\Parametre_Samare\\ParametresGaules.csv", delim = ';')
-ParametresGaules <- read_delim("data-raw\\Parametre_Samare\\ParametresGaules.csv", delim = ';')
+# write_delim(ParametresGaules, "data_raw\\Parametre_Samare\\ParametresGaules.csv", delim = ';')
+ParametresGaules <- fread("data-raw\\Parametre_Samare\\ParametresGaules.csv")
 
-#write_delim(CovparmGaules, "data_raw\\Parametre_Samare\\CovparmGaules.csv", delim = ';')
-CovparmGaules <- read_delim("data-raw\\Parametre_Samare\\CovparmGaules.csv", delim = ';')
+# write_delim(CovparmGaules, "data_raw\\Parametre_Samare\\CovparmGaules.csv", delim = ';')
+CovparmGaules <- fread("data-raw\\Parametre_Samare\\CovparmGaules.csv")
 
-#write_delim(Species, "data_raw\\Parametre_Samare\\Species.csv", delim = ';')
-Species <- read_delim("data-raw\\Parametre_Samare\\Species.csv", delim = ';')
+# write_delim(Species, "data_raw\\Parametre_Samare\\Species.csv", delim = ';')
+Species <- fread("data-raw\\Parametre_Samare\\Species.csv")
 
-#write_delim(SpeciesGroups, "data_raw\\Parametre_Samare\\SpeciesGroups.csv", delim = ';')
-SpeciesGroups <- read_delim("data-raw\\Parametre_Samare\\SpeciesGroups.csv", delim = ';')
+# write_delim(SpeciesGroups, "data_raw\\Parametre_Samare\\SpeciesGroups.csv", delim = ';')
+SpeciesGroups <- fread("data-raw\\Parametre_Samare\\SpeciesGroups.csv")
 
-#write_delim(MatchSpeciesGroups, "data_raw\\Parametre_Samare\\MatchSpeciesGroups.csv", delim = ';')
-MatchSpeciesGroups <- read_delim("data-raw\\Parametre_Samare\\MatchSpeciesGroups.csv", delim = ';')
+# write_delim(MatchSpeciesGroups, "data_raw\\Parametre_Samare\\MatchSpeciesGroups.csv", delim = ';')
+MatchSpeciesGroups <- fread("data-raw\\Parametre_Samare\\MatchSpeciesGroups.csv")
 
-#write_delim(SubModuleID, "data_raw\\Parametre_Samare\\SubModuleID.csv", delim = ';')
-SubModuleID <- read_delim("data-raw\\Parametre_Samare\\SubModuleID.csv", delim = ';')
+# write_delim(SubModuleID, "data_raw\\Parametre_Samare\\SubModuleID.csv", delim = ';')
+SubModuleID <- fread("data-raw\\Parametre_Samare\\SubModuleID.csv")
 
 
 
@@ -62,23 +62,20 @@ SubModuleID <- read_delim("data-raw\\Parametre_Samare\\SubModuleID.csv", delim =
 # pour le volume du BOJ, on utilise l'ERS dans le fichier MatchSpeciesGroups (VolumeSpeciesID=10) au lieu du BOJ (VolumeSpeciesID=2)
 # vérifier avec Filip si c'est volontaire (dans Artemis-Capsis, on utilise le volume du BOJ pour le BOJ)
 
-VolMatchSpeciesGroups <- read_delim("data-raw/0_VolMatchSpeciesGroups.csv", delim=';') %>% dplyr::select(-HarvestSpeciesID, -VegPotID)
-EssenceID_Ht <- read_delim("data-raw/0_SpeciesHD.csv", delim=';')
-EssenceID_Vol <- read_delim("data-raw/0_SpeciesVol.csv", delim=';')
+VolMatchSpeciesGroups <- fread("data-raw/0_VolMatchSpeciesGroups.csv")[, -c("HarvestSpeciesID", "VegPotID")]
+EssenceID_Ht <- fread("data-raw/0_SpeciesHD.csv")
+EssenceID_Vol <- fread("data-raw/0_SpeciesVol.csv")
 
-VolMatchSpeciesGroups <- left_join(VolMatchSpeciesGroups, Species) %>% dplyr::select(-SpeciesID)
-VolMatchSpeciesGroups <- left_join(VolMatchSpeciesGroups, SpeciesGroups) %>% dplyr::select(-SpeciesGroupID, -OldID)
-VolMatchSpeciesGroups <- left_join(VolMatchSpeciesGroups, EssenceID_Ht) %>% dplyr::select(-RelationHDSpeciesID)
+VolMatchSpeciesGroups <- VolMatchSpeciesGroups[Species, on = "SpeciesID", nomatch = NULL][, -c("SpeciesID")]
+VolMatchSpeciesGroups <- VolMatchSpeciesGroups[SpeciesGroups, on ="SpeciesGroupID", nomatch = NULL][, -c("SpeciesGroupID", "OldID")]
+VolMatchSpeciesGroups <- VolMatchSpeciesGroups[EssenceID_Ht, on = "RelationHDSpeciesID", nomatch = NULL][, -c("RelationHDSpeciesID")]
 
-ass_ess_ht_vol <- left_join(VolMatchSpeciesGroups, EssenceID_Vol) %>% dplyr::select(-VolumeSpeciesID) %>% rename(Espece=SpeciesName, GrEspece=SpeciesGroupName)
-
+ass_ess_ht_vol <- setnames(VolMatchSpeciesGroups[EssenceID_Vol, on = "VolumeSpeciesID", nomatch = NULL], c("SpeciesName", "SpeciesGroupName"), c("Espece", "GrEspece"))
 
 # tous les fichiers à mettre dans le fichier sysdata.rda
 usethis::use_data(MatchModuleCovparms, AttribQual, EffetCovParms, MatchModuleOmega, MatchModuleParameters, OmegaEvolQual, ParametresEvolQual,
-                  OmegaGaulesFormat, ParametresGaules, CovparmGaules,
-                  Species, SpeciesGroups, MatchSpeciesGroups, ass_ess_ht_vol,
-                  SubModuleID,
-                  internal=TRUE, overwrite = TRUE)
-
-
-
+  OmegaGaulesFormat, ParametresGaules, CovparmGaules,
+  Species, SpeciesGroups, MatchSpeciesGroups, ass_ess_ht_vol,
+  SubModuleID,
+  internal = TRUE, overwrite = TRUE
+)

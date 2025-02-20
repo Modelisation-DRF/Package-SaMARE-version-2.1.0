@@ -19,44 +19,66 @@ SortieDendroIterSamare <- function(SimulHtVol, simplifier = FALSE) {
   MinAnnee <- min(SimulHtVol$Annee)
   MaxAnnee <- max(SimulHtVol$Annee)
 
-  DendroIterSamaresp <- SimulHtVol %>%
-    mutate(Etat = ifelse(Etat == "mort", "mort", "vivant")) %>%
-    filter(Etat == "vivant") %>%
+  DendroIterSamaresp <- as.data.frame(
+    lazy_dt(SimulHtVol) %>%
+      mutate(Etat = ifelse(Etat == "mort", "mort", "vivant")) %>%
+      filter(Etat == "vivant") %>%
+      mutate(
+        Stm2ha = pi * (DHPcm / 200)^2 / Sup_PE,
+        vol_dm3 = ifelse(is.na(vol_dm3) == TRUE, 0, vol_dm3 / Sup_PE)
+      ) %>%
+      arrange(desc(hauteur_pred)) %>%
+      group_by(Placette, Iter, Annee, GrEspece, Etat, Residuel) %>%
+      mutate(NbCum = cumsum(Nombre)) %>%
+      mutate(
+        ST_HA = sum(Stm2ha),
+        Vol_HA = sum(vol_dm3) / 1000,
+        nbTi_HA = sum(Nombre / Sup_PE)
+      )
+  ) %>%
     mutate(
-      Stm2ha = pi * (DHPcm / 200)^2 / Sup_PE,
-      vol_dm3 = ifelse(is.na(vol_dm3) == TRUE, 0, vol_dm3 / Sup_PE)
-    ) %>%
-    arrange(desc(hauteur_pred)) %>%
-    group_by(Placette, Iter, Annee, GrEspece, Etat, Residuel) %>%
-    mutate(NbCum = cumsum(Nombre)) %>%
-    summarise(
-      ST_HA = sum(Stm2ha), Vol_HA = sum(vol_dm3) / 1000, nbTi_HA = sum(Nombre / Sup_PE), DQM = (ST_HA / nbTi_HA / pi)^0.5 * 200,
-      HDomM = ifelse(nbTi_HA > 100, mean(hauteur_pred[1:first(which((NbCum / Sup_PE) >= 100))], na.rm = TRUE), mean(hauteur_pred)), .groups = "drop"
+      DQM = (ST_HA / nbTi_HA / pi)^0.5 * 200,
+      HDomM = ifelse(nbTi_HA > 100, mean(hauteur_pred[1:first(which((NbCum / Sup_PE) >= 100))], na.rm = TRUE), mean(hauteur_pred))
     )
 
-
-
-  DendroIterSamare <- SimulHtVol %>%
-    mutate(Etat = ifelse(Etat == "mort", "mort", "vivant")) %>%
+  DendroIterSamare <- as.data.frame(
+    lazy_dt(SimulHtVol) %>%
+      mutate(Etat = ifelse(Etat == "mort", "mort", "vivant")) %>%
+      mutate(
+        Stm2ha = pi * (DHPcm / 200)^2 / Sup_PE,
+        vol_dm3 = ifelse(is.na(vol_dm3) == TRUE, 0, vol_dm3 / Sup_PE)
+      ) %>%
+      arrange(desc(hauteur_pred)) %>%
+      group_by(Placette, Iter, Annee, Etat, Residuel) %>%
+      mutate(NbCum = cumsum(Nombre)) %>%
+      mutate(
+        ST_HA = sum(Stm2ha),
+        Vol_HA = sum(vol_dm3) / 1000,
+        nbTi_HA = sum(Nombre / Sup_PE)
+      )
+  ) %>%
     mutate(
-      Stm2ha = pi * (DHPcm / 200)^2 / Sup_PE,
-      vol_dm3 = ifelse(is.na(vol_dm3) == TRUE, 0, vol_dm3 / Sup_PE)
-    ) %>%
-    arrange(desc(hauteur_pred)) %>%
-    group_by(Placette, Iter, Annee, Etat, Residuel) %>%
-    mutate(NbCum = cumsum(Nombre)) %>%
-    summarise(
-      ST_HA = sum(Stm2ha), Vol_HA = sum(vol_dm3) / 1000, nbTi_HA = sum(Nombre / Sup_PE), DQM = (ST_HA / nbTi_HA / pi)^0.5 * 200,
-      HDomM = ifelse(nbTi_HA > 100, mean(hauteur_pred[1:first(which((NbCum / Sup_PE) >= 100))], na.rm = TRUE), mean(hauteur_pred)), .groups = "drop"
-    ) %>%
-    mutate(
-      DQM = ifelse(Etat == "mort", NA, DQM), ST_HA = ifelse(Etat == "mort", NA, ST_HA),
-      Vol_HA = ifelse(Etat == "mort", NA, Vol_HA), HDomM = ifelse(Etat == "mort", NA, HDomM)
-    ) %>%
-    mutate(GrEspece = "TOT") %>%
-    rbind(DendroIterSamaresp) %>%
-    arrange(Placette, Annee, Residuel, Iter, GrEspece, desc(Etat)) %>%
-    relocate(Placette, Annee, Iter, Residuel, GrEspece, Etat, nbTi_HA, ST_HA, DQM, Vol_HA, HDomM)
+      DQM = (ST_HA / nbTi_HA / pi)^0.5 * 200,
+      HDomM = ifelse(nbTi_HA > 100, mean(hauteur_pred[1:first(which((NbCum / Sup_PE) >= 100))], na.rm = TRUE), mean(hauteur_pred))
+    )
+
+  DendroIterSamare <- as.data.frame(
+    lazy_dt(DendroIterSamare) %>%
+      mutate(
+        DQM = ifelse(Etat == "mort", NA, DQM),
+        ST_HA = ifelse(Etat == "mort", NA, ST_HA),
+        Vol_HA = ifelse(Etat == "mort", NA, Vol_HA),
+        HDomM = ifelse(Etat == "mort", NA, HDomM)
+      ) %>%
+      mutate(GrEspece = "TOT")
+  ) %>%
+    rbind(DendroIterSamaresp)
+
+  DendroIterSamare <- as.data.frame(
+    lazy_dt(DendroIterSamare) %>%
+      arrange(Placette, Annee, Residuel, Iter, GrEspece, desc(Etat)) %>%
+      relocate(Placette, Annee, Iter, Residuel, GrEspece, Etat, nbTi_HA, ST_HA, DQM, Vol_HA, HDomM)
+  )
 
   if (simplifier == TRUE) {
     DendroIterSamare_simp_min <- DendroIterSamare %>% filter(Annee == MinAnnee)

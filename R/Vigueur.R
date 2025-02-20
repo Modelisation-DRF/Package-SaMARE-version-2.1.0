@@ -41,9 +41,7 @@ vig <- function(Vig, type_pe_Plac, rid1, Iterj, Para.vig) {
     rep("RES", n * 9), rep("SAB", n * 9)
   )
 
-
   # Construction de la matrice X
-
   Xvig <- matrix(0, ncol = 131, nrow = n)
   Xvig[, 1] <- 1
   Xvig[, 2:7] <- (Vig$vigu0 == listeVigu0Inter3 & Vig$prod0 == listeProd0) * 1
@@ -55,10 +53,11 @@ vig <- function(Vig, type_pe_Plac, rid1, Iterj, Para.vig) {
   Xvig[, 41:130] <- (Vig$GrEspece == listeEssInter9 & rid1 == listeRid1) * 1
   Xvig[, 131] <- Vig$aam
 
-
   # selectionner les parametres de vigueur de l'itération
   ParaVigi <- Para.vig %>%
-    filter(Iter == Iterj)
+    lazy_dt() %>%
+    filter(Iter == Iterj) %>%
+    as.data.frame()
 
   # Création matrice Beta
   BetaMat <- matrix(ParaVigi$ParameterEstimate, ncol = 1)

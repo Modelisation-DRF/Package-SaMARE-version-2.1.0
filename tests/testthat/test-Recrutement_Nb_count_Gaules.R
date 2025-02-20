@@ -5,8 +5,13 @@ test_that("Recrutement_Nb_count_Gaules return the expected data", {
   Para.rec_gaules_test <- readRDS(test_path("fixtures", "Para.rec_gaules_test.rds"))
 
   Result <- rec_count_Gaules(
-    Rec = Rec_test_gaules, RecGaules = RecGaules_test, t = 5, st_tot0 = 21.5900825754271, Iterj = 1,
-    RandomPlacGaules = RandomPlacGaules_test, Para.rec_gaules = Para.rec_gaules_test
+    Rec = Rec_test_gaules,
+    RecGaules = RecGaules_test,
+    t = 5,
+    st_tot0 = 21.5900825754271,
+    Iterj = 1,
+    RandomPlacGaules = RandomPlacGaules_test,
+    Para.rec_gaules = Para.rec_gaules_test
   )
   Result <- data.frame(V1 = Result)
   Result <- Result %>% mutate(V1 = round(V1, 7))

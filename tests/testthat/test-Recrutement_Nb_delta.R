@@ -3,7 +3,12 @@ test_that("Recrutement_Nb_delta return the expected data", {
   Para.rec_n_for_test <- readRDS(test_path("fixtures", "Para.rec_n_for_test.rds"))
 
   Result <- rec_delta(
-    Rec = rec_lam_test, type_pe_Plac = "type0", st_tot0 = 21.5900825754271, ntrt = 1, t0_aj_ = 2.1, Iterj = 1L,
+    Rec = rec_lam_test,
+    type_pe_Plac = "type0",
+    st_tot0 = 21.5900825754271,
+    ntrt = 1,
+    t0_aj_ = 2.1,
+    Iterj = 1L,
     Para.rec_n = Para.rec_n_for_test
   )
 

@@ -23,8 +23,6 @@
 #' @param Para.nb_gaules Paramètres de l'équation de la prévision du nombre total de gaules.
 #' @return Retourne une prévision du nombre total de gaules à la fin du pas de simulation.
 #' @export
-
-
 nb_Gaules <- function(Rec, RecGaules, t, st_tot0, altitude, latitude, trt, t0_aj_,
                       longitude, temp, pente, Iterj, RandomPlacGaules, Para.nb_gaules) {
   select <- dplyr::select
@@ -42,10 +40,12 @@ nb_Gaules <- function(Rec, RecGaules, t, st_tot0, altitude, latitude, trt, t0_aj
   XNb_Gaules[, 9] <- ifelse(trt == "CP", t0_aj_, 0)
   XNb_Gaules[, 10] <- t
 
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   ParaNb_Gaules <- Para.nb_gaules %>%
-    filter(Iter == Iterj)
+    lazy_dt() %>%
+    filter(Iter == Iterj) %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(ParaNb_Gaules$ParameterEstimate, ncol = 1)
 
@@ -55,7 +55,6 @@ nb_Gaules <- function(Rec, RecGaules, t, st_tot0, altitude, latitude, trt, t0_aj
   Random <- RandomPlacGaules$RandomPlac[which(RandomPlacGaules$SubModuleID == 11)]
 
   pred <- exp(logit + Random)
-
 
   return(pred)
 }

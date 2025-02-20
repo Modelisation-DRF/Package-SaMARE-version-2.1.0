@@ -16,14 +16,18 @@ AttribQualFct <- function(PlacSansQual, rid1) {
   Alea_n <- runif(n = nrow(PlacSansQual))
   suppressMessages(
     PlacSansQualForm <- PlacSansQual %>%
-      inner_join(AttribQual, relationship = "many-to-many")
+      lazy_dt() %>%
+      inner_join(AttribQual, relationship = "many-to-many") %>%
+      as.data.frame()
   )
 
   PlacSansQualForm$Alea <- Alea_n
 
   PlacSansQualForm <- PlacSansQualForm %>%
+    lazy_dt() %>%
     mutate(PredQual = ifelse(Alea <= ProbQualC, "C", "D")) %>%
-    select(ArbreID, PredQual)
+    select(ArbreID, PredQual) %>%
+    as.data.frame()
 
   return(PlacSansQualForm)
 }

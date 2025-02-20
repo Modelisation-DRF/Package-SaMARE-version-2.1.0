@@ -11,7 +11,6 @@
 #' @param Para.68_SAB Paramètres de l'équation de prévision du nombre de gaules de sapin baumier de 6 et 8 cm de diamètre
 #' @return Retourne une probabilité d'absence de gaules de 6 et 8 cm de DHP de sapin baumier
 #' @export
-
 pi68SAB <- function(RecGaules, Ratio, dens_tot0, Iterj, RandomPlacGaules, Para.68_SAB) {
   select <- dplyr::select
 
@@ -22,10 +21,12 @@ pi68SAB <- function(RecGaules, Ratio, dens_tot0, Iterj, RandomPlacGaules, Para.6
   X68SAB_pi[, 3] <- RecGaules$lnNb_Gaules_68_Ess_Ha[which(RecGaules$GrEspece == "SAB")]
   X68SAB_pi[, 4] <- log(dens_tot0)
 
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   Para68SAB_pi <- Para.68_SAB %>%
-    filter(Iter == Iterj & response == "pi")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "pi") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(Para68SAB_pi$ParameterEstimate, ncol = 1)
 
@@ -55,7 +56,6 @@ pi68SAB <- function(RecGaules, Ratio, dens_tot0, Iterj, RandomPlacGaules, Para.6
 #' @param Para.68_SAB Paramètres de l'équation de prévision du nombre de gaules de sapin baumier de 6 et 8 cm de diamètre
 #' @return Retourne une prévision du nombre de gaules de 6 et 8 cm de DHP de sapin baumier lorsqu'elles sont présentes.
 #' @export
-
 count68SAB <- function(RecGaules, Ratio, Rec, trt, t0_aj_, dens_tot0, Iterj, RandomPlacGaules, Para.68_SAB) {
   # Construction matrice X
   X68SAB_count <- matrix(0, ncol = 6, nrow = 1)
@@ -66,12 +66,12 @@ count68SAB <- function(RecGaules, Ratio, Rec, trt, t0_aj_, dens_tot0, Iterj, Ran
   X68SAB_count[, 5] <- Rec$St_Ess_Ha[which(Rec$GrEspece == "SAB")]
   X68SAB_count[, 6] <- ifelse(trt == "CP", t0_aj_, 0)
 
-
-
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   Para68SAB_count <- Para.68_SAB %>%
-    filter(Iter == Iterj & response == "count")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "count") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(Para68SAB_count$ParameterEstimate, ncol = 1)
 

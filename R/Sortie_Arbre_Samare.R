@@ -9,8 +9,6 @@
 #' @return  Retourne un dataframe contenant l'ensemble des arbres pour chacune des
 #'          placettes, années, itérations.
 #' @export
-
-
 SortieArbreSamare <- function(SimulHtVol, simplifier = FALSE) {
   select <- dplyr::select
 
@@ -18,16 +16,17 @@ SortieArbreSamare <- function(SimulHtVol, simplifier = FALSE) {
   MaxAnnee <- max(SimulHtVol$Annee)
 
   ArbreSamare <- SimulHtVol %>%
+    lazy_dt() %>%
     mutate(
       Stm2 = pi * (DHPcm / 200)^2,
       Vigueur = case_when(
-        vigu0 == "ViG" & prod0 == "sciage" ~ 1,
-        vigu0 == "ViG" & prod0 == "pate" ~ 2,
-        vigu0 == "NONVIG" & prod0 == "sciage" & DHPcm >= 23.1 ~ 3,
-        vigu0 == "NONVIG" & prod0 == "sciage" & DHPcm < 23.1 ~ 4,
-        vigu0 == "NONVIG" & prod0 == "pate" ~ 4,
-        vigu0 == "ViG" & prod0 == "resineux" ~ 5,
-        vigu0 == "NONVIG" & prod0 == "resineux" ~ 6,
+        vigu0 == "ViG" & prod0 == "sciage" ~ as.integer(1),
+        vigu0 == "ViG" & prod0 == "pate" ~ as.integer(2),
+        vigu0 == "NONVIG" & prod0 == "sciage" & DHPcm >= 23.1 ~ as.integer(3),
+        vigu0 == "NONVIG" & prod0 == "sciage" & DHPcm < 23.1 ~ as.integer(4),
+        vigu0 == "NONVIG" & prod0 == "pate" ~ as.integer(4),
+        vigu0 == "ViG" & prod0 == "resineux" ~ as.integer(5),
+        vigu0 == "NONVIG" & prod0 == "resineux" ~ as.integer(6),
         TRUE ~ NA_integer_
       )
     ) %>%
@@ -39,32 +38,21 @@ SortieArbreSamare <- function(SimulHtVol, simplifier = FALSE) {
     relocate(
       PlacetteID, Annee, Iter, Residuel, ArbreID, origTreeID, Espece, GrEspece, Etat, Nombre, DHPcm, Hautm,
       ST_m2, Vol_dm3, MSCR, ABCD, Vigueur
-    )
-
-  # summarise(DQM=(mean(DHPcm^2,na.rm=TRUE))^0.5,ST_HA=sum(Stm2ha),VolM3Ha=sum(vol_dm3)/1000,
-  #           nbTi_HA=sum(Nombre/Sup_PE),HDomM=ifelse(nbTi_HA>100,mean(DHPcm[1:100],na.rm = TRUE),mean(DHPcm)), .groups="drop")%>%
-
-
-  #
-  # if(ArbreSamare$vigu0=="ViG"&&ArbreSamare$prod0=="sciage"){
-  #   ArbreSamare$Vigueur = 1
-  #
-  # }else if(ArbreSamare$vigu0=="ViG"&&ArbreSamare$prod0=="pate"){
-  #   ArbreSamare$Vigueur = 2
-  #
-  # }else if(ArbreSamare$vigu0=="NONVIG"&&ArbreSamare$prod0=="sciage"){
-  #   ArbreSamare$Vigueur = 3
-  #
-  # }else if(ArbreSamare$vigu0=="NONVIG"&&ArbreSamare$prod0=="pate"){
-  #   ArbreSamare$Vigueur = 4
-  #
-  # }
-  #
+    ) %>%
+    as.data.frame()
 
 
   if (simplifier == TRUE) {
-    ArbreSamare_simp_min <- ArbreSamare %>% filter(Annee == MinAnnee)
-    ArbreSamare_simp_max <- ArbreSamare %>% filter(Annee == MaxAnnee)
+    ArbreSamare_simp_min <- ArbreSamare %>%
+      lazy_dt() %>%
+      filter(Annee == MinAnnee) %>%
+      as.data.frame()
+
+    ArbreSamare_simp_max <- ArbreSamare %>%
+      lazy_dt() %>%
+      filter(Annee == MaxAnnee) %>%
+      as.data.frame()
+
     ArbreSamare <- rbind(ArbreSamare_simp_min, ArbreSamare_simp_max)
   }
 

@@ -20,7 +20,6 @@ rec_dhp <- function(RecSelect, st_tot0, dens_tot0, t, ntrt, Iterj, Para.rec_dhp)
   n <- nrow(RecSelect)
 
   # Liste des effets
-
   listeEss <- c(
     rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n), rep("ERS", n),
     rep("FEN", n), rep("FIN", n), rep("HEG", n), rep("RES", n), rep("SAB", n)
@@ -35,12 +34,12 @@ rec_dhp <- function(RecSelect, st_tot0, dens_tot0, t, ntrt, Iterj, Para.rec_dhp)
   Xrec_dhp[, 14] <- log(t)
   Xrec_dhp[, 15] <- ntrt
 
-
-
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_dhp <- Para.rec_dhp %>%
-    filter(Iter == Iterj)
+  ParaRec_dhp <- as.data.frame(
+    lazy_dt(Para.rec_dhp) %>%
+      filter(Iter == Iterj)
+  )
+
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_dhp$ParameterEstimate, ncol = 1)
 

@@ -24,7 +24,6 @@
 #'         aléatoires, ceux-ci sont ajoutés dans la fonction SaMARE avant
 #'         de convertir le prédicteur linéaire en probabilité de mortalité.
 #' @export
-
 mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mort) {
   select <- dplyr::select
 
@@ -54,7 +53,6 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
     )
 
     # Construction de la matrice X
-
     Xmort <- matrix(0, ncol = 75, nrow = n)
     Xmort[, 1] <- 1
     Xmort[, 2:3] <- (Mort$vigu0 == listeVigu0) * 1
@@ -72,7 +70,9 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
 
     # selectionner les parametres de mortalité de l'itération
     ParaMorti <- Para.mort %>%
-      filter(Iter == Iterj)
+      lazy_dt() %>%
+      filter(Iter == Iterj) %>%
+      as.data.frame()
 
     # Création matrice Beta
     BetaMat <- matrix(ParaMorti$ParameterEstimate, ncol = 1)
@@ -83,12 +83,20 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
     return(cloglog)
   } else {
     MortBck <- Mort
-    MortHEG <- Mort %>% filter(GrEspece == "HEG")
+    MortHEG <- Mort %>%
+      lazy_dt() %>%
+      filter(GrEspece == "HEG") %>%
+      as.data.frame()
     MortHEG <- MortHEG %>%
+      lazy_dt() %>%
       mutate(cloglog = -5.4430 + 0.0621 * DHPcm + log(t)) %>%
-      select(ArbreID, cloglog)
+      select(ArbreID, cloglog) %>%
+      as.data.frame()
 
-    Mort <- Mort %>% filter(GrEspece != "HEG")
+    Mort <- Mort %>%
+      lazy_dt() %>%
+      filter(GrEspece != "HEG") %>%
+      as.data.frame()
 
     n <- nrow(Mort)
 
@@ -113,7 +121,6 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
     )
 
     # Construction de la matrice X
-
     Xmort <- matrix(0, ncol = 75, nrow = n)
     Xmort[, 1] <- 1
     Xmort[, 2:3] <- (Mort$vigu0 == listeVigu0) * 1
@@ -131,7 +138,9 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
 
     # selectionner les parametres de mortalité de l'itération
     ParaMorti <- Para.mort %>%
-      filter(Iter == Iterj)
+      lazy_dt() %>%
+      filter(Iter == Iterj) %>%
+      as.data.frame()
 
     # Création matrice Beta
     BetaMat <- matrix(ParaMorti$ParameterEstimate, ncol = 1)
@@ -142,9 +151,13 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
     MortTot <- Mort %>%
       select(ArbreID, cloglog) %>%
       rbind(MortHEG)
+
     Mort <- MortBck %>%
+      lazy_dt() %>%
       inner_join(MortTot, by = "ArbreID") %>%
-      select(cloglog)
+      arrange(ArbreID) %>%
+      select(cloglog) %>%
+      as.data.frame()
 
     return(Mort)
   }

@@ -18,7 +18,7 @@
 #'                simuler ainsi que des variables nécessaire à la simulation.
 #' @param ListeIter Un dataframe contenant le numéro de la placette à simuler
 #'                  et le numéro de l'iteration à effecuer.
-#' @param AnneeDep Année de départ de la simulation.
+#' @param Annee_Inventaire Année de départ de la simulation.
 #' @param Horizon Nombre de pas de 5 ans de simulation à effectuer.
 #' @param RecruesGaules  Variable prenant la valeur de "1" pour utiliser les
 #'                       paramètres de recrutement basé sur l'inventaire des gaules
@@ -47,94 +47,131 @@
 #'        leur DHP pour chaque étape de 5 ans de l'horizon de simulation.
 #' @export
 
-SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Horizon, RecruesGaules,
+SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventaire, Horizon, RecruesGaules,
                    MCH, CovParms, CovParmsGaules, Para, ParaGaules, Omega, OmegaGaules) {
-  # x='TEM23APC5000_1'
-  # Random=RandPlacStep; RandomGaules=RandPlacStepGaules; Data=Data; Gaules=Gaules; ListeIter=ListeIter[ListeIter$PlacetteID==x,];
-  # AnneeDep=AnneeDep; Horizon=Horizon; RecruesGaules=RecruesGaules; MCH=MCH;
-  # CovParms=CovParms; CovParmsGaules=CovParmsGaules; Para=Para; ParaGaules=ParaGaules; Omega=Omega; OmegaGaules=OmegaGaules;
-
   select <- dplyr::select
   t <- 5
 
-
   #####################################################################
   ################## convertion MSCR #################################
-
-  # Para.ConvMSCRVig<-Para %>%
-  #   filter(SubModuleID==17)  #parametres pour vigueur
-  # Para.ConvMSCRProd1024<-Para %>%
-  #   filter(SubModuleID==18)  #parametres pour produits<24 cm
-  # Para.ConvMSCRProd24<-Para %>%
-  #   filter(SubModuleID==19)  #parametre pour produits>24cm
-
   # Liste d'Especes
   Especes <- c("AUT", "BOJ", "EPX", "ERR", "ERS", "FEN", "FIN", "HEG", "RES", "SAB")
-
 
   ################################################################################
   ######## Calcul des variables a l'echelle de la  placette #####################
   ###############################################################################
-
   # Création placette origine
   # Selectionner la placette et initialiser l'annee de depart et la correction du biais
-
   PlacOri <- Data %>%
+    lazy_dt() %>%
     filter(Placette == ListeIter$Placette) %>%
-    mutate(Annee = AnneeDep, Iter = ListeIter$Iter)
+    mutate(Annee = Annee_Inventaire, Iter = ListeIter$Iter) %>%
+    as.data.frame()
 
   ######### Creation paramètres
-
   ParaTot <- map_dfr(seq_len(1), ~Para) %>%
-    mutate(Iter = 1)
+    lazy_dt() %>%
+    mutate(Iter = 1) %>%
+    as.data.frame()
 
   ############## Gaules
-
-
   ParaTotGaules <- map_dfr(seq_len(1), ~ParaGaules) %>%
-    mutate(Iter = 1)
-
+    lazy_dt() %>%
+    mutate(Iter = 1) %>%
+    as.data.frame()
 
   ######################## Calcul des parametres des modules
-
-  Para.mort <- ParaOmega(ModuleID = 1, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.acc <- ParaOmega(ModuleID = 2, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.vig <- ParaOmega(ModuleID = 3, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.prod <- ParaOmega(ModuleID = 4, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.rec_n <- ParaOmega(ModuleID = 5, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.rec_dhp <- ParaOmega(ModuleID = 6, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.rec_vig <- ParaOmega(ModuleID = 7, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.rec_prod <- ParaOmega(ModuleID = 8, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.ConvMSCRVig <- ParaOmega(ModuleID = 17, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.ConvMSCRProd1024 <- ParaOmega(ModuleID = 18, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.ConvMSCRProd24 <- ParaOmega(ModuleID = 19, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
+  Para.mort <- ParaOmega(ModuleID = 1, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.acc <- ParaOmega(ModuleID = 2, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.vig <- ParaOmega(ModuleID = 3, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.prod <- ParaOmega(ModuleID = 4, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.rec_n <- ParaOmega(ModuleID = 5, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.rec_dhp <- ParaOmega(ModuleID = 6, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.rec_vig <- ParaOmega(ModuleID = 7, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.rec_prod <- ParaOmega(ModuleID = 8, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.ConvMSCRVig <- ParaOmega(ModuleID = 17, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.ConvMSCRProd1024 <- ParaOmega(ModuleID = 18, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.ConvMSCRProd24 <- ParaOmega(ModuleID = 19, ParaOri = Para, ParaIter = ParaTot, Omega = Omega, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
 
   ################### Calcul des parametres des gaules
-
-  Para.rec_gaules <- ParaOmega(ModuleID = 10, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.nb_gaules <- ParaOmega(ModuleID = 11, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.ratio_gaules <- ParaOmega(ModuleID = 12, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.68_ERS <- ParaOmega(ModuleID = 13, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.68_HEG <- ParaOmega(ModuleID = 14, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.68_BOJ <- ParaOmega(ModuleID = 15, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-  Para.68_SAB <- ParaOmega(ModuleID = 16, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
+  Para.rec_gaules <- ParaOmega(ModuleID = 10, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.nb_gaules <- ParaOmega(ModuleID = 11, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.ratio_gaules <- ParaOmega(ModuleID = 12, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.68_ERS <- ParaOmega(ModuleID = 13, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.68_HEG <- ParaOmega(ModuleID = 14, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.68_BOJ <- ParaOmega(ModuleID = 15, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
+  Para.68_SAB <- ParaOmega(ModuleID = 16, ParaOri = ParaGaules, ParaIter = ParaTotGaules, Omega = OmegaGaules, NbIter = 1) %>%
+    lazy_dt() %>%
+    mutate(Iter = PlacOri$Iter[1]) %>%
+    as.data.frame()
 
   ########################## Création de la placette de simulation
-
   Plac <- PlacOri %>%
+    lazy_dt() %>%
     filter(Etat %in% c(10, 11, 12, 40, 42, 30, 32, 50, 52, 70, 71, 72)) %>%
-    mutate(Etat = ifelse(Etat == 11, "martele", "vivant"), ArbreID = seq(1:n())) %>%
+    mutate(Etat = ifelse(Etat %in% c(11, 71, 72), "martele", "vivant"), ArbreID = seq(1:n())) %>%
     select(
       Placette, Annee, ArbreID, NoArbre, GrEspece, Espece, Etat,
       DHPcm, Nombre, Vigueur, Iter, MSCR, ABCD
-    )
-
-
+    ) %>%
+    as.data.frame()
 
   ################### Calcul des parametres d'es'evolution de la qualite
-
   PlacQual <- Plac %>%
-    filter(ABCD %in% c("A", "B", "C", "D") & Etat == "vivant")
+    lazy_dt() %>%
+    filter(ABCD %in% c("A", "B", "C", "D") & Etat == "vivant") %>%
+    as.data.frame()
 
   if (nrow(PlacQual) >= 1) {
     ParaBOJ <- ParametresEvolQual[which(ParametresEvolQual$Ess_groupe == "BOJ"), ]
@@ -149,20 +186,58 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     OmegaFEN <- OmegaEvolQual[which(OmegaEvolQual$Ess_groupe == "FEN"), ]
     OmegaHEG <- OmegaEvolQual[which(OmegaEvolQual$Ess_groupe == "HEG"), ]
 
-
-    Para.EvolQualBOJ1 <- ParaOmega(ModuleID = 1, ParaOri = ParaBOJ, ParaIter = ParaBOJ, Omega = OmegaBOJ, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualBOJ2 <- ParaOmega(ModuleID = 2, ParaOri = ParaBOJ, ParaIter = ParaBOJ, Omega = OmegaBOJ, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualBOJ3 <- ParaOmega(ModuleID = 3, ParaOri = ParaBOJ, ParaIter = ParaBOJ, Omega = OmegaBOJ, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualERR1 <- ParaOmega(ModuleID = 1, ParaOri = ParaERR, ParaIter = ParaERR, Omega = OmegaERR, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualERR2 <- ParaOmega(ModuleID = 2, ParaOri = ParaERR, ParaIter = ParaERR, Omega = OmegaERR, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualERS1 <- ParaOmega(ModuleID = 1, ParaOri = ParaERS, ParaIter = ParaERS, Omega = OmegaERS, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualERS2 <- ParaOmega(ModuleID = 2, ParaOri = ParaERS, ParaIter = ParaERS, Omega = OmegaERS, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualERS3 <- ParaOmega(ModuleID = 3, ParaOri = ParaERS, ParaIter = ParaERS, Omega = OmegaERS, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualFEN1 <- ParaOmega(ModuleID = 1, ParaOri = ParaFEN, ParaIter = ParaFEN, Omega = OmegaFEN, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualFEN2 <- ParaOmega(ModuleID = 2, ParaOri = ParaFEN, ParaIter = ParaFEN, Omega = OmegaFEN, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualHEG1 <- ParaOmega(ModuleID = 1, ParaOri = ParaHEG, ParaIter = ParaHEG, Omega = OmegaHEG, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualHEG2 <- ParaOmega(ModuleID = 2, ParaOri = ParaHEG, ParaIter = ParaHEG, Omega = OmegaHEG, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
-    Para.EvolQualHEG3 <- ParaOmega(ModuleID = 3, ParaOri = ParaHEG, ParaIter = ParaHEG, Omega = OmegaHEG, NbIter = 1) %>% mutate(Iter = PlacOri$Iter[1])
+    Para.EvolQualBOJ1 <- ParaOmega(ModuleID = 1, ParaOri = ParaBOJ, ParaIter = ParaBOJ, Omega = OmegaBOJ, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualBOJ2 <- ParaOmega(ModuleID = 2, ParaOri = ParaBOJ, ParaIter = ParaBOJ, Omega = OmegaBOJ, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualBOJ3 <- ParaOmega(ModuleID = 3, ParaOri = ParaBOJ, ParaIter = ParaBOJ, Omega = OmegaBOJ, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualERR1 <- ParaOmega(ModuleID = 1, ParaOri = ParaERR, ParaIter = ParaERR, Omega = OmegaERR, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualERR2 <- ParaOmega(ModuleID = 2, ParaOri = ParaERR, ParaIter = ParaERR, Omega = OmegaERR, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualERS1 <- ParaOmega(ModuleID = 1, ParaOri = ParaERS, ParaIter = ParaERS, Omega = OmegaERS, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualERS2 <- ParaOmega(ModuleID = 2, ParaOri = ParaERS, ParaIter = ParaERS, Omega = OmegaERS, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualERS3 <- ParaOmega(ModuleID = 3, ParaOri = ParaERS, ParaIter = ParaERS, Omega = OmegaERS, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualFEN1 <- ParaOmega(ModuleID = 1, ParaOri = ParaFEN, ParaIter = ParaFEN, Omega = OmegaFEN, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualFEN2 <- ParaOmega(ModuleID = 2, ParaOri = ParaFEN, ParaIter = ParaFEN, Omega = OmegaFEN, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualHEG1 <- ParaOmega(ModuleID = 1, ParaOri = ParaHEG, ParaIter = ParaHEG, Omega = OmegaHEG, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualHEG2 <- ParaOmega(ModuleID = 2, ParaOri = ParaHEG, ParaIter = ParaHEG, Omega = OmegaHEG, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
+    Para.EvolQualHEG3 <- ParaOmega(ModuleID = 3, ParaOri = ParaHEG, ParaIter = ParaHEG, Omega = OmegaHEG, NbIter = 1) %>%
+      lazy_dt() %>%
+      mutate(Iter = PlacOri$Iter[1]) %>%
+      as.data.frame()
 
     Para.EvolQual <- list(
       Para.EvolQualBOJ1, Para.EvolQualBOJ2, Para.EvolQualBOJ3, Para.EvolQualERR1, Para.EvolQualERR2, Para.EvolQualERS1,
@@ -171,15 +246,11 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     )
     Para.EvolQualTot <- c()
 
-
-
     for (i in 1:13) {
       Parai <- Para.EvolQual[[i]][, 3]
       Parai <- Parai[which(Parai$ParameterEstimate != 0), ]
       Para.EvolQualTot <- rbind(Para.EvolQualTot, Parai)
     }
-
-
 
     rm(
       ParaBOJ, ParaERR, ParaERS, ParaFEN, ParaHEG, OmegaBOJ, OmegaERR, OmegaERS, OmegaFEN, OmegaHEG, Para.EvolQualBOJ1, Para.EvolQualBOJ2,
@@ -190,17 +261,16 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
 
   rm(PlacQual)
 
-
   # Placette Gaules de simulation
   if (RecruesGaules == 1) {
     PlacGaules <- Gaules %>%
+      lazy_dt() %>%
       filter(Placette == ListeIter$Placette) %>%
-      mutate(Iter = ListeIter$Iter)
+      mutate(Iter = ListeIter$Iter) %>%
+      as.data.frame()
   }
 
-
   ################### Variables d'information sur la placette####################
-
   # Placette
   Placette <- PlacOri$Placette[1]
 
@@ -216,7 +286,7 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
   # Variable du peuplement residuel avec condition que si St >26 = TEM
   trt <- ifelse("martele" %in% Plac$Etat, "CP",
     ifelse((is.na(PlacOri$ntrt[1]) == TRUE | PlacOri$ntrt[1] == 0), "TEM",
-      ifelse(AnneeDep - PlacOri$Annee_Coupe[1] < 5 &
+      ifelse(Annee_Inventaire - PlacOri$Annee_Coupe[1] < 5 &
         (sum((Plac$DHPcm / 200)^2 * 3.1416 * Plac$Nombre) / Sup_PE) > 26, "TEM", "CP")
     )
   )
@@ -231,148 +301,123 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     ifelse(PlacOri$Sup_PE[1] >= 0.25 & PlacOri$Sup_PE[1] <= 0.5, "type1", "type2")
   )
 
-
   # Variables de classification écologiques
   latitude <- PlacOri$Latitude[1]
-
   longitude <- PlacOri$Longitude[1]
-
   altitude <- PlacOri$Altitude[1]
-
   pente <- ifelse(is.na(PlacOri$Pente[1] == TRUE), 6.5, PlacOri$Pente[1])
-
-  dom <- substr(PlacOri$Reg_Eco[1], 1, 1) %>% ifelse(!. %in% c("2", "3", "4"), "4", .) ## valeur de 4 attribué aux domaines pas dans la liste d'effets
-
+  dom <- substr(PlacOri$Reg_Eco[1], 1, 1) %>% ifelse(!. %in% c("2", "3", "4"), "4", .)
   reg <- PlacOri$Reg_Eco[1]
-
   rid1 <- ifelse(reg %in% c("1a", "2a", "2b", "2c"), "2o", ifelse(reg %in% c("4a", "4b", "4c"), "4o",
     ifelse(reg %in% c("4d", "4e", "4f", "4g", "4h"), "4e", reg)
   )) %>%
-    ifelse(!. %in% c("2o", "3a", "3b", "3c", "3d", "4e", "4o", "DU", "SV"), "4o", .) # Ajouté DU et SV qui manquaient et mis "4o" quand manquant
+    ifelse(!. %in% c("2o", "3a", "3b", "3c", "3d", "4e", "4o", "DU", "SV"), "4o", .)
   teco <- PlacOri$Type_Eco[1]
-
   vegp <- substr(PlacOri$Type_Eco[1], 1, 3)
 
   # Variables climatiques de la placette
   prec <- PlacOri$Ptot[1]
-
   temp <- PlacOri$Tmoy[1]
-
   grwd <- PlacOri$GrwDays[1]
 
   ################## Effets Aleatoires  de la placette#############################
-
-  RandPlac <- Random %>% filter(Placette == PlacOri$Placette[1] & Iter == PlacOri$Iter[1])
-
+  RandPlac <- Random %>%
+    lazy_dt() %>%
+    filter(Placette == PlacOri$Placette[1] & Iter == PlacOri$Iter[1]) %>%
+    as.data.frame()
 
   ################## Effets Aleatoires placette Gaules############################
-
   if (RecruesGaules == 1) {
-    RandomPlacGaules <- RandomGaules %>% filter(Placette == PlacOri$Placette[1] & Iter == PlacOri$Iter[1])
+    RandomPlacGaules <- RandomGaules %>%
+      lazy_dt() %>%
+      filter(Placette == PlacOri$Placette[1] & Iter == PlacOri$Iter[1]) %>%
+      as.data.frame()
   }
-
 
   ###############################################################################
   ######################## Simulation de la placette##############################
   ##############################################################################
-
   # Initialisation du fichier qui contiendra les résultats de simulation de la placette
-
   outputTot <- c()
 
   ###############################################################################
   #################### boucle pour les k périodes de 5 ans a simuler #############
-
   for (k in 1:Horizon) {
     # k=2
     ################## Mise à jour des variable pour la période se simulation########
-
     # Si premier pas de simulation, on utilise le fichier de depart de la placette
-
-
-
     if (k == 1) {
       Plac <- Plac %>%
-        mutate(Annee = AnneeDep + t)
+        lazy_dt() %>%
+        mutate(Annee = Annee_Inventaire + t) %>%
+        as.data.frame()
 
       ################## Atribution de vigueur et de produit##############
-
-
       ParaViglist <- list(Para.ConvMSCRVig)
-
-
       Vigu0 <- Plac %>%
+        lazy_dt() %>%
         group_by(Placette, NoArbre) %>%
         nest() %>%
         mutate(vigu0 = mapply(AttribVigu0, data, MoreArgs = ParaViglist)) %>%
-        unnest(vigu0) %>%
-        select(-data)
-
+        dt_unnest(vigu0) %>%
+        select(-data, -V1) %>%
+        as.data.frame()
 
       ParaProdlist <- list(Para.ConvMSCRProd1024, Para.ConvMSCRProd24)
 
       Prod0 <- Plac %>%
+        lazy_dt() %>%
         group_by(Placette, NoArbre) %>%
         nest() %>%
         mutate(prod0 = mapply(AttribProd0, data, MoreArgs = ParaProdlist)) %>%
-        unnest(prod0) %>%
-        select(-data)
+        dt_unnest(prod0) %>%
+        select(-data, -V1) %>%
+        as.data.frame()
 
       suppressMessages(
         Plac <- Plac %>%
+          lazy_dt() %>%
           left_join(Vigu0) %>%
-          left_join(Prod0)
+          left_join(Prod0) %>%
+          as.data.frame()
       )
 
-
       ######## Dataframe avec les conditions initiales de la placette##############
-
       outputInitial <- Plac %>%
-        mutate(Annee = AnneeDep, Residuel = 0) %>%
+        lazy_dt() %>%
+        mutate(Annee = Annee_Inventaire, Residuel = 0) %>%
         select(
           Placette, Annee, ArbreID, NoArbre, Nombre, GrEspece,
           Espece, Etat, DHPcm, vigu0, prod0, ABCD, MSCR, Residuel, Iter
-        )
+        ) %>%
+        as.data.frame()
 
       ####### Modification placette et création de la mesure résiduelle si martelage
-
       if ("martele" %in% Plac$Etat) {
         outputInitial <- Plac %>%
+          lazy_dt() %>%
           filter(Etat == "vivant") %>%
-          mutate(Annee = AnneeDep, Residuel = 1) %>%
+          mutate(Annee = Annee_Inventaire, Residuel = 1) %>%
           select(
             Placette, Annee, ArbreID, NoArbre, Nombre, GrEspece,
             Espece, Etat, DHPcm, vigu0, prod0, ABCD, MSCR, Residuel, Iter
           ) %>%
-          rbind(outputInitial, .)
+          rbind(outputInitial, .) %>%
+          as.data.frame()
 
         Plac <- Plac %>%
+          lazy_dt() %>%
           filter(Etat == "vivant") %>%
-          select(-MSCR)
+          select(-MSCR) %>%
+          as.data.frame()
 
-        t0 <- AnneeDep
+        t0 <- Annee_Inventaire
       }
 
       ########################### Résidus de l'arbre####################################
-
-      # Periodes<-c("ArbreID",paste("Periode","_",c(1:Horizon),sep=""))
-      #
-      # Residus<-matrix(0,nrow=nrow(Plac),ncol=Horizon+1)
-      #
-      # colnames(Residus)<-Periodes
-      #
-      # Residus[,1]<-Plac$ArbreID
-
       Residual <- CovParms$ParameterEstimate[which(CovParms$CovParm == "Residual")]
-
       Rho <- CovParms$ParameterEstimate[which(CovParms$CovParm == "RHO")]
-
       Gamma <- CovParms$ParameterEstimate[which(CovParms$CovParm == "Gamma")]
-
-      # for (i in 1:Horizon){
-      #
-      #   Residus[,i+1]<-rnorm(nrow(Residus),mean=0,sqrt(Residual*Gamma*(Rho^(i-1))))
-      # }
 
       # fonction pour générer un element de la matrice de var-cov ARMA(1,1)
       f <- function(i, j, var_res, gamma, rho) {
@@ -386,15 +431,13 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
       Residus <- cbind(Plac$ArbreID, Residus)
       colnames(Residus) <- c("ArbreID", paste("Periode", "_", c(1:Horizon), sep = ""))
 
-
-
       ######### Mise en forme des statistiques de gaules qui seront mises à jour par la suite
-
       if (RecruesGaules == 1) {
         RecGaules <- data.frame("GrEspece" = c("AUT", "BOJ", "EPX", "ERR", "ERS", "FEN", "FIN", "HEG", "RES", "SAB"))
 
         suppressMessages(
           Nb_Gaules_Ha <- PlacGaules %>%
+            lazy_dt() %>%
             mutate(NbHa = Nombre / Sup_PE, NbHa68 = ifelse(DHPcm > 5, Nombre / Sup_PE, 0)) %>%
             group_by(GrEspece) %>%
             summarise(
@@ -402,18 +445,21 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
               lnNb_Gaules_Ess_Ha = log(sum(NbHa) + 1),
               lnNb_Gaules_24_Ess_Ha = log(sum(NbHa) - sum(NbHa68) + 1),
               lnNb_Gaules_68_Ess_Ha = log(sum(NbHa68) + 1)
-            )
+            ) %>%
+            as.data.frame()
         )
 
         outputTot$Nb_Gaules_Ha <- sum(Nb_Gaules_Ha$Nb_Gaules_Ess_Ha)
 
         outputTot$Nb_Gaules_68_Ha <- sum(exp(Nb_Gaules_Ha$lnNb_Gaules_68_Ess_Ha) - 1)
       }
-    } else { # Si 2e pas de simulation ou plus, on prend le fichier qui contient les simulations et on garde seulement le dernier pas
-
+    } else {
+      # Si 2e pas de simulation ou plus, on prend le fichier qui contient les simulations et on garde seulement le dernier pas
       Plac <- outputTot %>%
-        filter(Annee == AnneeDep + (k - 1) * t & Etat != "mort") %>%
-        mutate(Annee = AnneeDep + k * t, Etat = "vivant")
+        lazy_dt() %>%
+        filter(Annee == Annee_Inventaire + (k - 1) * t & Etat != "mort") %>%
+        mutate(Annee = Annee_Inventaire + k * t, Etat = "vivant") %>%
+        as.data.frame()
     }
 
     # Temps depuis coupe
@@ -421,7 +467,7 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
       t0_aj_ <- Plac$Annee[1] - t0 - 4.9
     } else {
       t0_aj_ <- 0
-    } ###### on ajuste pour que lorsque la step débute immédiatement après coupe t0_aj a une valeur de 0.1
+    }
 
     # Réduction de la mortalité
     fact_red <- ifelse(trt == "TEM", 0, ifelse(t0_aj_ <= 3, 1, 0))
@@ -429,11 +475,13 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     # calcul variable echelle placette
     st_tot0 <- sum((Plac$DHPcm / 200)^2 * 3.1416 * Plac$Nombre) / Sup_PE
 
-
     dens_tot0 <- sum(Plac$Nombre) / Sup_PE
 
     # Random iteration
-    RandPlacetteStep <- RandPlac %>% filter(Step == k)
+    RandPlacetteStep <- RandPlac %>%
+      lazy_dt() %>%
+      filter(Step == k) %>%
+      as.data.frame()
 
     # Recrutement Gaules
     if (RecruesGaules == 1) {
@@ -441,6 +489,7 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
 
       suppressMessages(
         RecGaules <- RecGaules %>%
+          lazy_dt() %>%
           left_join(Nb_Gaules_Ha) %>%
           mutate(
             Nb_Gaules_Ess_Ha = ifelse(is.na(Nb_Gaules_Ess_Ha) == TRUE, 0, Nb_Gaules_Ess_Ha),
@@ -448,93 +497,103 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
             lnNb_Gaules_24_Ess_Ha = ifelse(is.na(lnNb_Gaules_24_Ess_Ha) == TRUE, log(1), lnNb_Gaules_24_Ess_Ha),
             lnNb_Gaules_68_Ess_Ha = ifelse(is.na(lnNb_Gaules_68_Ess_Ha) == TRUE, log(1), lnNb_Gaules_68_Ess_Ha),
             Ratio = Nb_Gaules_Ess_Ha / sum(Nb_Gaules_Ess_Ha)
-          )
+          ) %>%
+          as.data.frame()
       )
     }
 
     ############################### Mortalite ######################################
-
     Mort <- Plac
 
     # Effets aléatoires pour la mortalité
-    RandomMort <- RandPlacetteStep %>% filter(SubModuleID == 1)
+    RandomMort <- RandPlacetteStep %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 1) %>%
+      as.data.frame()
 
     # Application de la fonction de mortalité
     pred <- mort(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mort)
 
-
     Mort$pred_mort <- pred
 
     Plac <- Mort %>%
+      lazy_dt() %>%
       mutate(
         pred_mort = (1 - exp(-exp(pred_mort + RandomMort$RandomPlac + RandomMort$RandomStep))), Alea = runif(n()),
         Etat1 = as.character(ifelse(Alea <= pred_mort, "mort", Etat))
       ) %>%
-      select(-pred_mort, -Alea)
+      select(-pred_mort, -Alea) %>%
+      as.data.frame()
 
     ##################### Accroissement en diamètre#################################
-
     # fonction d'accroissement en dhp pour etre appliquee a un arbre
-    # accijk=(Xijk*B+bi+bik/Dt^0.5)2
-
     # fichier des arbres de la placette pour appliquer le module d'accroissement
     Accrois <- Plac
 
     # Effets aléatoire pour l'accroissement
-    RandomAcc <- RandPlacetteStep %>% filter(SubModuleID == 2)
-
-
+    RandomAcc <- RandPlacetteStep %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 2) %>%
+      as.data.frame()
 
     # on applique la fonction d'accroissement
-
     pred <- accrois(Accrois, st_tot0, t, fact_red, ntrt, type_pe_Plac, Iterj, Para.acc)
 
     Accrois$pred_acc <- ((pred + RandomAcc$RandomPlac + RandomAcc$RandomStep + Residus[, k + 1])^2) - 1
 
     Plac <- Accrois %>%
+      lazy_dt() %>%
       mutate(pred_acc = ifelse(pred_acc < 0, 0, pred_acc)) %>%
       mutate(
         DHPcm1 = as.numeric(ifelse(Etat1 == "vivant", DHPcm + (round(pred_acc) / 10), NA)),
         aam = as.numeric(ifelse(Etat1 == "vivant", round(pred_acc) / (10 * t), NA))
       ) %>%
       select(-pred_acc) %>%
-      arrange(ArbreID)
-
+      arrange(ArbreID) %>%
+      as.data.frame()
 
     ######################## VIGUEUR#################################################
-    Vig <- Plac %>% filter(Etat == "vivant")
+    Vig <- Plac %>%
+      lazy_dt() %>%
+      filter(Etat == "vivant") %>%
+      as.data.frame()
 
     # Application de la fonction de vigueur
     pred <- vig(Vig, type_pe_Plac, rid1, Iterj, Para.vig)
 
-    RandomVig <- RandPlacetteStep %>% filter(SubModuleID == 3)
+    RandomVig <- RandPlacetteStep %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 3) %>%
+      as.data.frame()
 
     Vig$pred_vig <- pred + RandomVig$RandomPlac
 
     suppressMessages(
       Plac <- Vig %>%
+        lazy_dt() %>%
         mutate(
           pred_vig = (exp(pred_vig) / (1 + exp(pred_vig))), Alea = runif(n()),
           vigu1 = as.character(ifelse(Alea <= pred_vig, "ViG", "NONVIG"))
         ) %>%
         select(ArbreID, vigu1) %>%
-        right_join(Plac)
+        right_join(Plac) %>%
+        as.data.frame()
     )
 
     ################# PRODUIT#######################################################
-
-    Prod <- Plac %>% filter(prod0 != "resineux" & Etat1 != "mort")
+    Prod <- Plac %>%
+      lazy_dt() %>%
+      filter(prod0 != "resineux" & Etat1 != "mort") %>%
+      as.data.frame()
 
     # Application de la fonction de produit
-
     pred <- produit(Prod, type_pe_Plac, rid1, Iterj, Para.prod)
-
     RandomProd <- RandPlacetteStep %>% filter(SubModuleID == 4)
-
     Prod$pred_prod <- pred + RandomProd$RandomPlac
 
     suppressMessages(
       Plac <- Prod %>%
+        lazy_dt() %>%
         mutate(
           pred_prod = (exp(pred_prod) /
             (1 + exp(pred_prod))), Alea = runif(n()),
@@ -545,105 +604,115 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
         select(ArbreID, prod1) %>%
         right_join(Plac) %>%
         mutate(prod1 = as.character(ifelse(prod0 == "resineux", "resineux", prod1))) %>%
-        arrange(ArbreID)
+        arrange(ArbreID) %>%
+        as.data.frame()
     )
 
     ############################# Evolution Qualite##############################
-
     PlacQual <- Plac %>%
-      filter(ABCD %in% c("A", "B", "C", "D") & Etat == "vivant")
+      lazy_dt() %>%
+      filter(ABCD %in% c("A", "B", "C", "D") & Etat == "vivant") %>%
+      as.data.frame()
 
     if (nrow(PlacQual) > 0) {
       TigesQual <- EvolQual(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQualTot)
       suppressMessages(
         Plac <- Plac %>%
+          lazy_dt() %>%
           left_join(TigesQual) %>%
           mutate(ABCD = ABCD1) %>%
-          select(-ABCD1)
+          select(-ABCD1) %>%
+          as.data.frame()
       )
     }
 
     rm(PlacQual)
 
     ############################## Attribution Qualite###########################
-
-    if (length(PlacOri$ABCD[which(PlacOri$ABCD %in% c("A", "B", "C", "D"))]) > 0) {
+    if (length(PlacOri$ABCD[which(PlacOri$ABCD %in% c("A", "B", "C", "D") & PlacOri$Etat %in% c(10, 12, 40, 42, 30, 32, 50, 52, 70))]) > 0) {
       PlacSansQual <- Plac %>%
-        filter(GrEspece %in% c("BOJ", "ERR", "ERS", "FEN", "FIN", "HEG") & (is.na(ABCD) == TRUE | is.null(ABCD) == TRUE | ABCD == "") & DHPcm1 >= 23.05 & DHPcm < 23.05)
+        lazy_dt() %>%
+        filter(GrEspece %in% c("BOJ", "ERR", "ERS", "FEN", "FIN", "HEG") & (is.na(ABCD) == TRUE | is.null(ABCD) == TRUE | ABCD == "") & DHPcm1 >= 23.05 & DHPcm < 23.05) %>%
+        as.data.frame()
 
       if (nrow(PlacSansQual) > 0) {
         PlacSansQual <- AttribQualFct(PlacSansQual, rid1)
 
         suppressMessages(
           Plac <- Plac %>%
+            lazy_dt() %>%
             left_join(PlacSansQual) %>%
             mutate(ABCD = ifelse(is.na(PredQual) == FALSE, PredQual, ABCD)) %>%
-            select(-PredQual)
+            select(-PredQual) %>%
+            as.data.frame()
         )
       }
     }
 
-
-
-    ################## RECRUTEMENT##################################################
-
-    ################# Nombre de  Recrues
+    ################## RECRUTEMENT#################################################
+    ################# Nombre de  Recrues ##########################################
     Rec <- data.frame("GrEspece" = c("AUT", "BOJ", "EPX", "ERR", "ERS", "FEN", "FIN", "HEG", "RES", "SAB"))
 
     if (RecruesGaules == 1) {
       suppressMessages(
         St_Ess_Ha <- Plac %>%
+          lazy_dt() %>%
           filter(Etat == "vivant") %>%
           mutate(Stm2ha = (DHPcm / 200)^2 * 3.1416 * Nombre / Sup_PE, NbHa = Nombre / Sup_PE) %>%
           group_by(GrEspece) %>%
           summarise(
             St_Ess_Ha = sum(Stm2ha), lnSt_Ess_Ha = log(sum(Stm2ha) + 1),
             lnNb_Ess_Ha = log(sum(NbHa) + 1), NbHa = sum(NbHa)
-          )
+          ) %>%
+          as.data.frame()
       )
 
       suppressMessages(
         Rec <- Rec %>%
+          lazy_dt() %>%
           left_join(St_Ess_Ha) %>%
           mutate(
             lnSt_Ess_Ha = ifelse(is.na(lnSt_Ess_Ha) == TRUE, log(1), lnSt_Ess_Ha),
             St_Ess_Ha = ifelse(is.na(St_Ess_Ha) == TRUE, 0, St_Ess_Ha),
             NbHa = ifelse(is.na(NbHa) == TRUE, 0, NbHa),
             lnNb_Ess_Ha = ifelse(is.na(lnNb_Ess_Ha) == TRUE, log(1), lnNb_Ess_Ha)
-          )
+          ) %>%
+          as.data.frame()
       )
 
       disp <- CovParmsGaules$ParameterEstimate[which(CovParmsGaules$SubModuleID == 10 & CovParmsGaules$response == "disp")]
-
       Rec$Pi <- rec_pi_Gaules(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules, Para.rec_gaules)
-
       Rec$Count <- rec_count_Gaules(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules, Para.rec_gaules)
 
-      RecBase <- map_dfr(seq_len(151), ~Rec) %>% # dataframe de base pour le recrutement
+      RecBase <- map_dfr(seq_len(151), ~Rec) %>%
+        lazy_dt() %>%
         arrange(GrEspece) %>%
-        mutate(m = rep(c(0, 1:150), 10))
-
+        mutate(m = rep(c(0, 1:150), 10)) %>%
+        as.data.frame()
 
       RecTot <- RecBase %>%
+        lazy_dt() %>%
         mutate(mu = rep(c(0, rep(1, 150)), 10)) %>%
         mutate(Pr = (gamma(m + 1 / disp)) / (gamma(1 / disp) * factorial(m)) * (1 / (Count * disp + 1))^(1 / disp) *
           ((Count * disp) / (Count * disp + 1))^m) %>%
         mutate(Pr = (Pi + (1 - Pi) * Pr)^(1 - mu) * ((1 - Pi) * Pr)^mu) %>%
         group_by(GrEspece) %>%
-        mutate(CumPr = ifelse(m == 150, 1, cumsum(Pr))) # Assure d'avoir un ,aximum de 150 recrues
+        mutate(CumPr = ifelse(m == 150, 1, cumsum(Pr))) %>%
+        as.data.frame()
 
       suppressMessages(
         RecSelect <- RecTot %>%
+          lazy_dt() %>%
           group_by(GrEspece) %>%
           mutate(Alea = runif(1)) %>%
           mutate(Valeur = CumPr > Alea) %>%
           filter(Valeur == "TRUE") %>%
           summarise(NbRecrues = first(m)) %>% #
-          filter(NbRecrues != 0)
+          filter(NbRecrues != 0) %>%
+          as.data.frame()
       )
 
       ################## Mise à jour Nombre de gaules
-
       predNbGaules <- round(nb_Gaules(
         Rec, RecGaules, t, st_tot0, altitude, latitude, trt, t0_aj_,
         longitude, temp, pente, Iterj, RandomPlacGaules, Para.nb_gaules
@@ -663,6 +732,7 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
       )
 
       Ratio <- Ratio %>%
+        lazy_dt() %>%
         mutate(
           TotRatio = (1 - Pi) * Count, FinalRatio = TotRatio / sum(TotRatio),
           Nb_Gaules_Ha = as.numeric(predNbGaules)
@@ -670,10 +740,10 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
         mutate(
           Nb_Gaules_Ess_Ha = as.numeric(FinalRatio * Nb_Gaules_Ha),
           lnNb_Gaules_Ess_Ha = as.numeric(log(Nb_Gaules_Ess_Ha + 1))
-        )
+        ) %>%
+        as.data.frame()
 
       ########## Nb 6 et 8
-
       Pred68ERS <- round((1 - pi68ERS(RecGaules, Ratio, Iterj, RandomPlacGaules, Para.68_ERS)) *
         count68ERS(RecGaules, Ratio, dens_tot0, grwd, Iterj, RandomPlacGaules, Para.68_ERS))
 
@@ -686,10 +756,9 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
       Pred68SAB <- round((1 - pi68SAB(RecGaules, Ratio, dens_tot0, Iterj, RandomPlacGaules, Para.68_SAB)) *
         count68SAB(RecGaules, Ratio, Rec, trt, t0_aj_, dens_tot0, Iterj, RandomPlacGaules, Para.68_SAB))
 
-
       ########## Mise à jour Gaules
-
       Nb68 <- Ratio %>%
+        lazy_dt() %>%
         mutate(lnNb_Gaules_24_Ess_Ha = ifelse(GrEspece == "ERS", ifelse(Nb_Gaules_Ess_Ha[5] > Pred68ERS, log(Nb_Gaules_Ess_Ha[5] - Pred68ERS + 1), 0),
           ifelse(GrEspece == "HEG", ifelse(Nb_Gaules_Ess_Ha[8] > Pred68HEG, log(Nb_Gaules_Ess_Ha[8] - Pred68HEG + 1), 0),
             ifelse(GrEspece == "BOJ", ifelse(Nb_Gaules_Ess_Ha[2] > Pred68BOJ, log(Nb_Gaules_Ess_Ha[2] - Pred68BOJ + 1), 0),
@@ -704,74 +773,74 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
             )
           )
         )) %>%
-        select(GrEspece, Nb_Gaules_Ha, Nb_Gaules_Ess_Ha, lnNb_Gaules_Ess_Ha, lnNb_Gaules_24_Ess_Ha, lnNb_Gaules_68_Ess_Ha)
+        select(GrEspece, Nb_Gaules_Ha, Nb_Gaules_Ess_Ha, lnNb_Gaules_Ess_Ha, lnNb_Gaules_24_Ess_Ha, lnNb_Gaules_68_Ess_Ha) %>%
+        as.data.frame()
 
-
-
-      Nb_Gaules_Ha <- Nb68 ######### Remplace le fichier initial Nb_Gaules_Ha
-    } else { ############## Début du module de recrutement sans les gaules
-
+      Nb_Gaules_Ha <- Nb68
+    } else {
+      # Début du module de recrutement sans les gaules
       suppressMessages(
         StEss_1014 <- Plac %>%
+          lazy_dt() %>%
           filter(Etat == "vivant" & DHPcm < 15.1) %>%
           mutate(Stm2ha = (DHPcm / 200)^2 * 3.1416 * Nombre / Sup_PE) %>%
           group_by(GrEspece) %>%
-          summarise(logst_ess_1014 = log(sum(Stm2ha) + 0.01))
+          summarise(logst_ess_1014 = log(sum(Stm2ha) + 0.01)) %>%
+          as.data.frame()
       )
-
-
 
       suppressMessages(
         Rec <- Rec %>%
+          lazy_dt() %>%
           left_join(StEss_1014) %>%
           mutate(
             logst_ess_1014 = ifelse(is.na(logst_ess_1014) == TRUE, log(0.01), logst_ess_1014),
             GrEssRec = c("feu", "feu", "rex", "feu", "ers", "feu", "rex", "heg", "rex", "sab")
-          )
+          ) %>%
+          as.data.frame()
       )
 
-
       RandomRec <- RandPlacetteStep %>% filter(SubModuleID == 5)
-
       Rec$predPi <- (exp(rec_pi(Rec, t, st_tot0, ntrt, t0_aj_, type_pe_Plac, Iterj, Para.rec_n) + RandomRec$RandomPlac)) /
         (1 + exp(rec_pi(Rec, t, st_tot0, ntrt, t0_aj_, type_pe_Plac, Iterj, Para.rec_n) + RandomRec$RandomPlac))
-
       Rec$predDelta <- exp(rec_delta(Rec, st_tot0, type_pe_Plac, ntrt, t0_aj_, Iterj, Para.rec_n))
-
       Rec$predLambda <- exp(rec_lambda(Rec, type_pe_Plac, st_tot0, t, Iterj, Para.rec_n))
 
-
-
-
-      RecBase <- map_dfr(seq_len(151), ~Rec) %>% # dataframe de base pour le recrutement
+      RecBase <- map_dfr(seq_len(151), ~Rec) %>%
+        lazy_dt() %>%
         arrange(GrEspece) %>%
-        mutate(m = rep(c(0:150), 10))
-
+        mutate(m = rep(c(0:150), 10)) %>%
+        as.data.frame()
 
       RecTot <- RecBase %>%
+        lazy_dt() %>%
         mutate(mu = rep(c(0, rep(1, 150)), 10)) %>%
         mutate(Pr = predPi^(1 - mu) * ((1 - predPi) * (exp(-predDelta * m^predLambda) -
           exp(-predDelta * (m + 1)^predLambda)) / exp(-predDelta))^mu) %>%
         group_by(GrEspece) %>%
-        mutate(CumPr = cumsum(Pr))
+        mutate(CumPr = cumsum(Pr)) %>%
+        as.data.frame()
 
       suppressMessages(
         RecSelect <- RecTot %>%
+          lazy_dt() %>%
           group_by(GrEspece) %>%
           mutate(Alea = runif(1)) %>%
           mutate(Valeur = CumPr > Alea) %>%
           filter(Valeur == "TRUE") %>%
           summarise(NbRecrues = first(m)) %>%
-          filter(NbRecrues != 0)
+          filter(NbRecrues != 0) %>%
+          as.data.frame()
       )
     }
 
-
     Plac <- Plac %>%
+      lazy_dt() %>%
       select(
         Placette, Annee, ArbreID, NoArbre, Nombre, GrEspece, Espece, Etat1, DHPcm1,
         vigu1, prod1, ABCD, Iter
-      ) ###### Mise en forme de Plac pour fusion avec recrues
+      ) %>%
+      as.data.frame()
 
     if (nrow(Plac) == 0) {
       break
@@ -779,45 +848,53 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
 
     if (nrow(Plac[which(Plac$Etat1 == "vivant"), ]) == 0) {
       break
-    } ###### Arrete simulation et écris les valeurs dans un fichier log
+    }
 
-
-    if (nrow(RecSelect) >= 1) { ###### Si présence de recrues sinon on saute cette partie de code
-
+    if (nrow(RecSelect) >= 1) {
+      # Si présence de recrues sinon on saute cette partie de code
       suppressMessages(
         RecSelect <- RecSelect %>%
+          lazy_dt() %>%
           group_by(GrEspece) %>%
           slice(rep(1:n(), first(NbRecrues))) %>%
           ungroup() %>%
-          mutate(ArbreID = c(1:n()) + last(Plac$ArbreID))
+          mutate(ArbreID = c(1:n()) + last(Plac$ArbreID)) %>%
+          as.data.frame()
       )
 
-
-      ############# DHP Recrues
-      RandomRecDhp <- RandPlacetteStep %>% filter(SubModuleID == 6)
-
+      ############# DHP Recrues #################################################
+      RandomRecDhp <- RandPlacetteStep %>%
+        lazy_dt() %>%
+        filter(SubModuleID == 6) %>%
+        as.data.frame()
       varRecDhp <- CovParms$ParameterEstimate[which(CovParms$CovParm == "sigma2_res")]
-
       theta <- CovParms$ParameterEstimate[which(CovParms$CovParm == "theta")]
-
-      RandomRecProd <- RandPlacetteStep %>% filter(SubModuleID == 8)
+      RandomRecProd <- RandPlacetteStep %>%
+        lazy_dt() %>%
+        filter(SubModuleID == 8) %>%
+        as.data.frame()
 
       # on applique la fonction du DHP des recrues
-
       RecSelect <- RecSelect %>%
+        lazy_dt() %>%
         mutate(
           pred_dhp = rec_dhp(RecSelect, st_tot0, dens_tot0, t, ntrt, Iterj, Para.rec_dhp),
           eijk = rnorm(n(), mean = 0, sd = sqrt(varRecDhp * pred_dhp^theta)),
           DHPcm1 = ((pred_dhp + RandomRecDhp$RandomPlac + RandomRecDhp$RandomStep + eijk)^2 + 90) / 10,
           DHPcm1 = ifelse(DHPcm1 >= 9.1, DHPcm1, 9.1)
         ) %>%
-        select(ArbreID, GrEspece, DHPcm1)
-      RecSelect$DHPcm1 <- RecSelect$DHPcm1[, 1]
+        select(ArbreID, GrEspece, DHPcm1) %>%
+        as.data.frame()
+      RecSelect$DHPcm1 <- RecSelect$DHPcm1
 
       ######################## Vigueur des recrues#####################################
-      RandomRecVig <- RandPlacetteStep %>% filter(SubModuleID == 7)
+      RandomRecVig <- RandPlacetteStep %>%
+        lazy_dt() %>%
+        filter(SubModuleID == 7) %>%
+        as.data.frame()
 
       RecSelect <- RecSelect %>%
+        lazy_dt() %>%
         mutate(
           pred_vig = rec_vig(RecSelect, latitude, Iterj, Para.rec_vig),
           AleaVig = runif(n()),
@@ -825,14 +902,18 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
             (1 + exp(pred_vig + RandomRecVig$RandomPlac + RandomRecVig$RandomStep)),
           vigu1 = ifelse(AleaVig <= predVigRand, "ViG", "NONVIG")
         ) %>%
-        select(ArbreID, GrEspece, DHPcm1, vigu1)
-      RecSelect$vigu1 <- RecSelect$vigu1[, 1]
-
+        select(ArbreID, GrEspece, DHPcm1, vigu1) %>%
+        as.data.frame()
+      RecSelect$vigu1 <- RecSelect$vigu1
 
       ####################### Produit des recrues#####################################
-      RandomRecProd <- RandPlacetteStep %>% filter(SubModuleID == 8)
+      RandomRecProd <- RandPlacetteStep %>%
+        lazy_dt() %>%
+        filter(SubModuleID == 8) %>%
+        as.data.frame()
 
       RecSelect <- RecSelect %>%
+        lazy_dt() %>%
         mutate(
           pred_prod = rec_prod(RecSelect, type_pe_Plac, rid1, Iterj, Para.rec_prod),
           AleaProd = runif(n()),
@@ -844,19 +925,12 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
             )
           )
         ) %>%
-        select(ArbreID, GrEspece, DHPcm1, vigu1, prod1)
+        select(ArbreID, GrEspece, DHPcm1, vigu1, prod1) %>%
+        as.data.frame()
 
       ######### Ajout des résidus des recrues
-
       # Résidus de l'arbre
       if (k < Horizon) {
-        # ResidusRec<-matrix(0,nrow=nrow(RecSelect),ncol=Horizon+1)
-        # ResidusRec[,1]<-RecSelect$ArbreID
-        #
-        # for (i in (k+1):Horizon){
-        #   ResidusRec[,i+1]<-rnorm(nrow(ResidusRec),
-        #                           mean=0,sqrt(Residual*Gamma*(Rho^(i-k-1))))
-        # }
         # créer et remplir la matrice de var-cov ARMA(1,1)
         varcov <- expand.grid(i = 1:(Horizon - k), j = 1:(Horizon - k))
         varcov <- matrix(f(varcov$i, varcov$j, Residual, Gamma, Rho), nrow = Horizon - k)
@@ -868,30 +942,30 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
 
         Residus <- rbind(Residus, ResidusRec)
       }
-      ######## Ajout des recrues au fichier des Placettes
+      # Ajout des recrues au fichier des Placettes
       RecSelect <- RecSelect %>%
+        lazy_dt() %>%
         mutate(
-          Placette = Placette, Annee = AnneeDep + k * t, NoArbre = NA,
+          Placette = Placette, Annee = Annee_Inventaire + k * t, NoArbre = NA,
           Espece = ifelse(GrEspece %in% c("BOJ", "ERR", "ERS", "HEG", "SAB"), GrEspece, NA),
           Etat1 = "recrue", Nombre = Sup_PE / 0.25, Iter = PlacOri$Iter[1]
-        )
+        ) %>%
+        as.data.frame()
 
-      Plac <- Plac %>%
-        bind_rows(RecSelect)
-    } ####### Fin du recrutement
-
+      Plac <- Plac %>% bind_rows(RecSelect)
+    }
+    # Fin du recrutement
 
     # on ajoute les donnees du pas de simulation en cours aux autres pas de simulation pour la placette
-
     if (k < Horizon) {
       m <- which(Plac$Etat1 != "mort", arr.ind = TRUE)
-      Residus <- matrix(Residus[m, ], nrow = length(m), ncol = Horizon + 1) ##### Enlève les arbres morts des résidus pour la prochaine step de croissance
+      Residus <- matrix(Residus[m, ], nrow = length(m), ncol = Horizon + 1)
     }
 
-
     Plac <- Plac %>%
-      rename(Etat = Etat1, DHPcm = DHPcm1, vigu0 = vigu1, prod0 = prod1)
-
+      lazy_dt() %>%
+      rename(Etat = Etat1, DHPcm = DHPcm1, vigu0 = vigu1, prod0 = prod1) %>%
+      as.data.frame()
 
     if (RecruesGaules == 1) {
       Plac$Nb_Gaules_Ha <- sum(Nb_Gaules_Ha$Nb_Gaules_Ess_Ha)
@@ -907,18 +981,23 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
     }
 
     outputTot <- bind_rows(outputTot, Plac)
-  } # fin de la boucle des simulations
+  }
+  # fin de la boucle des simulations
 
 
   ParaConvVigMSCRlist <- list(Para)
-
   if (!is.null(outputTot)) {
     if (any(is.na(outputInitial$MSCR))) {
-      outputInitial <- outputInitial %>% select(-MSCR)
+      outputInitial <- outputInitial %>%
+        lazy_dt() %>%
+        select(-MSCR) %>%
+        as.data.frame()
 
       suppressMessages(
         outputTot <- outputTot %>%
+          lazy_dt() %>%
           mutate(Residuel = 0) %>%
+          as.data.frame() %>%
           bind_rows(outputInitial, .)
       )
 
@@ -931,42 +1010,55 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, AnneeDep, Hori
 
       suppressMessages(
         outputTot <- outputTot %>%
-          left_join(MSCR)
+          lazy_dt() %>%
+          left_join(MSCR) %>%
+          as.data.frame()
       )
     } else {
       MSCR <- outputTot %>%
+        lazy_dt() %>%
         group_by(Placette, Annee, ArbreID, Iter) %>%
         nest() %>%
         mutate(MSCR = mapply(AttribMSCR, data, MoreArgs = ParaConvVigMSCRlist)) %>%
-        unnest(MSCR) %>%
-        select(-data)
+        dt_unnest(MSCR) %>%
+        select(-data, -V1) %>%
+        as.data.frame()
 
       suppressMessages(
         outputTot <- outputTot %>%
+          lazy_dt() %>%
           left_join(MSCR) %>%
           mutate(Residuel = 0) %>%
-          bind_rows(outputInitial, .)
+          bind_rows(outputInitial, .) %>%
+          as.data.frame()
       )
     }
   } else {
     if (any(is.na(outputInitial$MSCR))) {
-      outputTot <- outputInitial %>% select(-MSCR)
+      outputTot <- outputInitial %>%
+        lazy_dt() %>%
+        select(-MSCR) %>%
+        as.data.frame()
 
       MSCR <- outputTot %>%
+        lazy_dt() %>%
         group_by(Placette, Annee, ArbreID, Residuel, Iter) %>%
         nest() %>%
         mutate(MSCR = mapply(AttribMSCR, data, MoreArgs = ParaConvVigMSCRlist)) %>%
-        unnest(MSCR) %>%
-        select(-data)
+        dt_unnest(MSCR) %>%
+        select(-data, -V1) %>%
+        as.data.frame()
 
       suppressMessages(
         outputTot <- outputTot %>%
-          left_join(MSCR)
+          lazy_dt() %>%
+          left_join(MSCR) %>%
+          as.data.frame()
       )
     } else {
       outputTot <- outputInitial
     }
   }
 
-  return(outputTot)
+  return(as.data.frame(outputTot))
 }

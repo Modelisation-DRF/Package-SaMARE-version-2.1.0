@@ -10,7 +10,6 @@
 #' @param Para.68_ERS Paramètres de l'équation de prévision du nombre de gaules d'érable à sucre de 6 et 8 cm de diamètre
 #' @return Retourne une probabilité d'absence de gaules de 6 et 8 cm de DHP d'érable à sucre
 #' @export
-
 pi68ERS <- function(RecGaules, Ratio, Iterj, RandomPlacGaules, Para.68_ERS) {
   select <- dplyr::select
 
@@ -21,10 +20,12 @@ pi68ERS <- function(RecGaules, Ratio, Iterj, RandomPlacGaules, Para.68_ERS) {
   X68ERS_pi[, 3] <- Ratio$lnNb_Gaules_Ess_Ha[which(Ratio$GrEspece == "ERS")]
   X68ERS_pi[, 4] <- RecGaules$lnNb_Gaules_68_Ess_Ha[which(RecGaules$GrEspece == "ERS")]
 
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   Para68ERS_pi <- Para.68_ERS %>%
-    filter(Iter == Iterj & response == "pi")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "pi") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(Para68ERS_pi$ParameterEstimate, ncol = 1)
 
@@ -52,8 +53,6 @@ pi68ERS <- function(RecGaules, Ratio, Iterj, RandomPlacGaules, Para.68_ERS) {
 #' @param Para.68_ERS Paramètres de l'équation de prévision du nombre de gaules d'érable à sucre de 6 et 8 cm de diamètre
 #' @return Retourne une prévision du nombre de gaules de 6 et 8 cm de DHP d'érable à sucre lorsquelles sont présentes
 #' @export
-
-
 count68ERS <- function(RecGaules, Ratio, dens_tot0, grwd, Iterj, RandomPlacGaules, Para.68_ERS) {
   # Construction matrice X
   X68ERS_count <- matrix(0, ncol = 5, nrow = 1)
@@ -63,12 +62,12 @@ count68ERS <- function(RecGaules, Ratio, dens_tot0, grwd, Iterj, RandomPlacGaule
   X68ERS_count[, 4] <- log(dens_tot0)
   X68ERS_count[, 5] <- grwd
 
-
-
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   Para68ERS_count <- Para.68_ERS %>%
-    filter(Iter == Iterj & response == "count")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "count") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(Para68ERS_count$ParameterEstimate, ncol = 1)
 

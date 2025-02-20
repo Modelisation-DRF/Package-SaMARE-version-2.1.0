@@ -10,7 +10,6 @@ test_that("La fonction SortieBillonage() gère les essences comme attendu", {
   fic$GrEspece <- GrEspece
 
   # il devrait y avoir des estimations pour 13 lignes
-
   # essences samare:      "AUT" "BOJ" "EPX" "ERR" "ERS" "FEN" "FIN" "HEG" "RES" "SAB"
   # essences billonnage:         BOJ         ERR   ERS               HEG               CHR  BOP
 

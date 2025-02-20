@@ -29,9 +29,18 @@ AttribMSCR <- function(Data, Para.ConvVigMSCR) {
     XConvVigMSCR[, 5:9] <- (Data$GrEspece == listeEss) * 1
 
     # selectionner les parametres de conversion en vigeur
-    Para.ConvVigMSCR1 <- Para.ConvVigMSCR %>% filter(SubModuleID == 20 & response == 1)
-    Para.ConvVigMSCR2 <- Para.ConvVigMSCR %>% filter(SubModuleID == 20 & response == 2)
-    Para.ConvVigMSCR3 <- Para.ConvVigMSCR %>% filter(SubModuleID == 20 & response == 3)
+    Para.ConvVigMSCR1 <- Para.ConvVigMSCR %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 20 & response == 1) %>%
+      as.data.frame()
+    Para.ConvVigMSCR2 <- Para.ConvVigMSCR %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 20 & response == 2) %>%
+      as.data.frame()
+    Para.ConvVigMSCR3 <- Para.ConvVigMSCR %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 20 & response == 3) %>%
+      as.data.frame()
 
     # Construction matrice beta
     BetaMat1 <- matrix(Para.ConvVigMSCR1$ParameterEstimate, ncol = 1)
@@ -62,9 +71,18 @@ AttribMSCR <- function(Data, Para.ConvVigMSCR) {
     XConvVigMSCR[, 5] <- Data$DHPcm
 
     # selectionner les parametres de conversion en vigeur
-    Para.ConvVigMSCR1 <- Para.ConvVigMSCR %>% filter(SubModuleID == 21 & response == 1)
-    Para.ConvVigMSCR2 <- Para.ConvVigMSCR %>% filter(SubModuleID == 21 & response == 2)
-    Para.ConvVigMSCR3 <- Para.ConvVigMSCR %>% filter(SubModuleID == 21 & response == 3)
+    Para.ConvVigMSCR1 <- Para.ConvVigMSCR %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 21 & response == 1) %>%
+      as.data.frame()
+    Para.ConvVigMSCR2 <- Para.ConvVigMSCR %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 21 & response == 2) %>%
+      as.data.frame()
+    Para.ConvVigMSCR3 <- Para.ConvVigMSCR %>%
+      lazy_dt() %>%
+      filter(SubModuleID == 21 & response == 3) %>%
+      as.data.frame()
 
     # Construction matrice beta
     BetaMat1 <- matrix(Para.ConvVigMSCR1$ParameterEstimate, ncol = 1)
@@ -83,11 +101,6 @@ AttribMSCR <- function(Data, Para.ConvVigMSCR) {
     Alea <- runif(n = n)
     MSCR <- ifelse(Alea < probM, "M", ifelse(Alea < probS, "S", ifelse(Alea < probC, "C", "R")))
   }
-
-
-
-
-
 
   return(MSCR)
 }

@@ -20,7 +20,6 @@ rec_prod <- function(RecSelect, type_pe_Plac, rid1, Iterj, Para.rec_prod) {
   n <- nrow(RecSelect)
 
   # Liste des effets
-
   listeEss <- c(
     rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n), rep("ERS", n),
     rep("FEN", n), rep("FIN", n), rep("HEG", n), rep("RES", n), rep("SAB", n)
@@ -40,8 +39,10 @@ rec_prod <- function(RecSelect, type_pe_Plac, rid1, Iterj, Para.rec_prod) {
 
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_prod <- Para.rec_prod %>%
-    filter(Iter == Iterj)
+  ParaRec_prod <- as.data.frame(
+    lazy_dt(Para.rec_prod) %>%
+      filter(Iter == Iterj)
+  )
 
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_prod$ParameterEstimate, ncol = 1)

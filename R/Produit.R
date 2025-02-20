@@ -13,7 +13,6 @@
 #' @return Retourne le prédicteur linéaire de l'équation de la probabilité que
 #'         la tige contienne un produit de type "sciage".
 #' @export
-
 produit <- function(Prod, type_pe_Plac, rid1, Iterj, Para.prod) {
   select <- dplyr::select
 
@@ -37,9 +36,7 @@ produit <- function(Prod, type_pe_Plac, rid1, Iterj, Para.prod) {
     rep("RES", n * 9), rep("SAB", n * 9)
   )
 
-
   # Construction de la matrice X
-
   Xprod <- matrix(0, ncol = 140, nrow = n)
   Xprod[, 1] <- 1
   Xprod[, 2:7] <- (Prod$vigu0 == listeVigu0Inter3 & Prod$prod0 == listeProd0) * 1
@@ -51,10 +48,11 @@ produit <- function(Prod, type_pe_Plac, rid1, Iterj, Para.prod) {
   Xprod[, 50:139] <- (Prod$GrEspece == listeEssInter9 & rid1 == listeRid1) * 1
   Xprod[, 140] <- Prod$aam
 
-
   # selectionner les parametres de vigueur de l'itération
   ParaProdi <- Para.prod %>%
-    filter(Iter == Iterj)
+    lazy_dt() %>%
+    filter(Iter == Iterj) %>%
+    as.data.frame()
 
   # Création matrice Beta
   BetaMat <- matrix(ParaProdi$ParameterEstimate, ncol = 1)

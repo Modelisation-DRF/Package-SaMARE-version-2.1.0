@@ -18,17 +18,16 @@
 #' }
 #'
 #' @export
-
 valide_data <- function(data) {
   data <- renommer_les_colonnes(data)
   validations <- list(
     valide_espece = "Code d'essence non valide",
-    valide_Etat = "Code d'\uE9tat non valide",
+    valide_Etat = "Code d'\u00E9tat non valide",
     valide_DHPcm = "Valeur de DHP non permise",
     valide_Vigueur = "Code de vigueur non permis",
     valide_Sup_PE = "Superficie de la placette en ha non valide",
     valide_Nombre = "valeur de nombre null",
-    valide_Annee_Coupe = "Ann\uE9e de coupe non valide",
+    valide_Annee_Coupe = "Ann\u00E9e de coupe non valide",
     valide_Latitude = "Latitude non valide",
     valide_Longitude = "Longitude non valide",
     valide_Altitude = "Altitude non valide",
@@ -81,7 +80,6 @@ valide_data <- function(data) {
 #' }
 #'
 #' @export
-
 valide_data_gaules <- function(data) {
   data <- renommer_les_colonnes_gaules(data)
 
@@ -106,10 +104,8 @@ valide_data_gaules <- function(data) {
     }
   }
 
-
   return(erreurs)
 }
-
 
 #' Fonction pour vérifier que les valeurs saisies dans la colonne 'nombre' sont correctes.
 #' @param data fichier des arbres
@@ -137,10 +133,8 @@ valide_Nombre <- function(data) {
     return(FALSE)
   }
 
-
   return(all(data$Nombre > 0))
 }
-
 
 #' Cette fonction vérifie si la colonne 'Nombre' dans le fichier de données contient des valeurs valides pour chaque 'Placette'.
 #' Elle s'assure que la colonne existe, qu'elle n'est pas vide, qu'elle ne contient pas de valeurs manquantes (NA), et que la somme des valeurs pour chaque 'Placette' est supérieure à zéro.
@@ -174,13 +168,13 @@ valide_Nombre_gaules <- function(data) {
     return(FALSE)
   }
 
-
-
-  resultats <- data %>%
-    group_by(Placette) %>%
-    reframe(
-      somme = sum(Nombre) > 0
-    )
+  resultats <- as.data.frame(
+    lazy_dt(data) %>%
+      group_by(Placette) %>%
+      reframe(
+        somme = sum(Nombre) > 0
+      )
+  )
 
   return(all(resultats$somme))
 }
@@ -259,12 +253,17 @@ valide_Etat <- function(data) {
     return(FALSE)
   }
 
-  valeurs_autorisees <- c(
+  valeurs_autorises <- c(
     10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 25, 26, 27,
     28, 29, 30, 32, 34, 36, 40, 42, 43, 44, 46, 50, 52, 54, 56
   )
 
-  return(all(data$Etat %in% valeurs_autorisees))
+  valeurs_samare <- c(10, 11, 12, 40, 42, 30, 32, 50, 52, 70, 71, 72)
+
+  verifier_Etat_samare <- any(data$Etat %in% valeurs_samare)
+  verifier_Etat <- all(data$Etat %in% valeurs_autorises)
+
+  return(verifier_Etat_samare & verifier_Etat)
 }
 
 #' Fonction pour vérifier que les valeurs saisies dans la colonne 'DHPcm' sont correctes.
@@ -345,7 +344,6 @@ valide_Vigueur <- function(data) {
     return(FALSE)
   }
 
-
   valeurs_autorisees <- c(1, 2, 3, 4, 5, 6, NA)
   Espece_specifiques_1_4 <- c(
     "BOG", "BOJ", "BOP", "CAC", "CAF", "CAR", "CEO", "CET", "CHB", "CHE", "CHG",
@@ -363,15 +361,17 @@ valide_Vigueur <- function(data) {
   )
 
 
-  resultats <- data %>%
-    mutate(
-      condition_1 = Vigueur %in% valeurs_autorisees,
-      condition_2 = if_else(is.na(Vigueur), MSCR %in% c("M", "S", "C", "R", "MS", "CR"), TRUE),
-      condition_3 = if_else(Vigueur %in% c(1, 2, 3, 4), Espece %in% Espece_specifiques_1_4, TRUE),
-      condition_4 = if_else(Vigueur %in% c(5, 6), Espece %in% Espece_specifiques_5_6, TRUE),
-      condition_5 = if_else(Vigueur == 3, DHPcm >= 23.1, TRUE)
-    ) %>%
-    reframe(all_conditions = all(condition_1 & condition_2 & condition_3 & condition_4 & condition_5))
+  resultats <- as.data.frame(
+    lazy_dt(data) %>%
+      mutate(
+        condition_1 = Vigueur %in% valeurs_autorisees,
+        condition_2 = if_else(is.na(Vigueur), MSCR %in% c("M", "S", "C", "R", "MS", "CR"), TRUE),
+        condition_3 = if_else(Vigueur %in% c(1, 2, 3, 4), Espece %in% Espece_specifiques_1_4, TRUE),
+        condition_4 = if_else(Vigueur %in% c(5, 6), Espece %in% Espece_specifiques_5_6, TRUE),
+        condition_5 = if_else(Vigueur == 3, DHPcm >= 23.1, TRUE)
+      ) %>%
+      reframe(all_conditions = all(condition_1 & condition_2 & condition_3 & condition_4 & condition_5))
+  )
 
   return(resultats$all_conditions)
 }
@@ -408,11 +408,15 @@ valide_Sup_PE <- function(data) {
   if (any(is.na(data$Sup_PE))) {
     return(FALSE)
   }
-  resultats <- data %>%
-    group_by(Placette) %>%
-    reframe(
-      valeur_unique = n_distinct(Sup_PE) == 1 && all(Sup_PE >= 0.04 & Sup_PE <= 1)
-    )
+
+  resultats <- as.data.frame(
+    lazy_dt(data) %>%
+      group_by(Placette) %>%
+      reframe(
+        valeur_unique = n_distinct(Sup_PE) == 1 && all(Sup_PE >= 0.04 & Sup_PE <= 1)
+      )
+  )
+
   return(all(resultats$valeur_unique))
 }
 
@@ -439,6 +443,7 @@ valide_Sup_PE_gaules <- function(data) {
   if (!all(c("Placette", "Sup_PE") %in% names(data))) {
     return(FALSE)
   }
+
   if (length(data$Sup_PE) == 0) {
     return(FALSE)
   }
@@ -447,11 +452,14 @@ valide_Sup_PE_gaules <- function(data) {
     return(FALSE)
   }
 
-  resultats <- data %>%
-    group_by(Placette) %>%
-    reframe(
-      valeur_unique = n_distinct(Sup_PE) == 1 && all(Sup_PE >= 0.004 & Sup_PE <= 1)
-    )
+  resultats <- as.data.frame(
+    lazy_dt(data) %>%
+      group_by(Placette) %>%
+      reframe(
+        valeur_unique = n_distinct(Sup_PE) == 1 && all(Sup_PE >= 0.004 & Sup_PE <= 1)
+      )
+  )
+
   return(all(resultats$valeur_unique))
 }
 
@@ -477,20 +485,22 @@ valide_Annee_Coupe <- function(data) {
     return(FALSE)
   }
 
-
   if (length(data$Placette) == 0) {
     return(FALSE)
   }
 
-  resultats <- data %>%
-    group_by(Placette) %>%
-    reframe(
-      valeur_unique = if (all(is.na(Annee_Coupe))) {
-        ntrt == 0
-      } else {
-        n_distinct(Annee_Coupe) == 1 && all(Annee_Coupe >= 1900 & Annee_Coupe <= 2100)
-      }
-    )
+  resultats <- as.data.frame(
+    lazy_dt(data) %>%
+      group_by(Placette) %>%
+      reframe(
+        valeur_unique = if (all(is.na(Annee_Coupe))) {
+          ntrt == 0
+        } else {
+          n_distinct(Annee_Coupe) == 1 && all(Annee_Coupe >= 1900 & Annee_Coupe <= 2100)
+        }
+      )
+  )
+
   return(all(resultats$valeur_unique))
 }
 
@@ -526,11 +536,14 @@ valide_Latitude <- function(data) {
     return(FALSE)
   }
 
-  resultats <- data %>%
-    group_by(Placette) %>%
-    reframe(
-      valeur_unique = n_distinct(Latitude) == 1 && all(Latitude > 45 & Latitude < 48.5)
-    )
+  resultats <- as.data.frame(
+    lazy_dt(data) %>%
+      group_by(Placette) %>%
+      reframe(
+        valeur_unique = n_distinct(Latitude) == 1 && all(Latitude > 45 & Latitude < 48.5)
+      )
+  )
+
   return(all(resultats$valeur_unique))
 }
 
@@ -565,11 +578,12 @@ valide_Longitude <- function(data) {
   if (any(is.na(data$Longitude))) {
     return(FALSE)
   }
-  resultats <- data %>%
+  resultats <- as.data.frame(lazy_dt(data) %>%
     group_by(Placette) %>%
     reframe(
       valeur_unique = n_distinct(Longitude) == 1 && all(Longitude > -79.5 & Longitude < -64.0)
-    )
+    ))
+
   return(all(resultats$valeur_unique))
 }
 
@@ -596,6 +610,7 @@ valide_Altitude <- function(data) {
   if (!all(c("Placette", "Altitude") %in% names(data))) {
     return(FALSE)
   }
+
   if (length(data$Altitude) == 0) {
     return(FALSE)
   }
@@ -604,11 +619,14 @@ valide_Altitude <- function(data) {
     return(FALSE)
   }
 
-  resultats <- data %>%
-    group_by(Placette) %>%
-    reframe(
-      valeur_unique = n_distinct(Altitude) == 1 && all(Altitude < 1000)
-    )
+  resultats <- as.data.frame(
+    lazy_dt(data) %>%
+      group_by(Placette) %>%
+      reframe(
+        valeur_unique = n_distinct(Altitude) == 1 && all(Altitude < 1000)
+      )
+  )
+
   return(all(resultats$valeur_unique))
 }
 
@@ -637,12 +655,12 @@ valide_Ptot <- function(data) {
     return(FALSE)
   }
 
-
-  resultats <- data %>%
+  resultats <- as.data.frame(lazy_dt(data) %>%
     group_by(Placette) %>%
     reframe(
       valeur_unique = n_distinct(Ptot) == 1 && all(Ptot < 2000)
-    )
+    ))
+
   return(all(resultats$valeur_unique))
 }
 
@@ -674,11 +692,13 @@ valide_Tmoy <- function(data) {
   if (any(is.na(data$Tmoy))) {
     return(FALSE)
   }
-  resultats <- data %>%
+
+  resultats <- as.data.frame(lazy_dt(data) %>%
     group_by(Placette) %>%
     reframe(
       valeur_unique = n_distinct(Tmoy) == 1 && all(Tmoy > 0 & Tmoy < 10)
-    )
+    ))
+
   return(all(resultats$valeur_unique))
 }
 
@@ -704,6 +724,7 @@ valide_Type_Eco <- function(data) {
   if (!all(c("Placette", "Type_Eco") %in% names(data))) {
     return(FALSE)
   }
+
   if (length(data$Type_Eco) == 0) {
     return(FALSE)
   }
@@ -711,6 +732,7 @@ valide_Type_Eco <- function(data) {
   if (any(is.na(data$Type_Eco))) {
     return(FALSE)
   }
+
   valeurs_autorisees <- c(
     "FC10", "FC11", "FC12", "FE10", "FE11", "FE12", "FE13", "FE15", "FE16", "FE20", "FE21",
     "FE22", "FE23", "FE24", "FE25", "FE26", "FE28", "FE30", "FE31", "FE32", "FE32H", "FE33",
@@ -737,11 +759,14 @@ valide_Type_Eco <- function(data) {
     return(FALSE)
   }
 
-  resultats <- data %>%
-    group_by(Placette) %>%
-    reframe(
-      valeur_unique = n_distinct(Type_Eco) == 1
-    )
+  resultats <- as.data.frame(
+    lazy_dt(data) %>%
+      group_by(Placette) %>%
+      reframe(
+        valeur_unique = n_distinct(Type_Eco) == 1
+      )
+  )
+
   return(all(resultats$valeur_unique))
 }
 
@@ -767,6 +792,7 @@ valide_Reg_Eco <- function(data) {
   if (!all(c("Placette", "Reg_Eco") %in% names(data))) {
     return(FALSE)
   }
+
   if (length(data$Reg_Eco) == 0) {
     return(FALSE)
   }
@@ -784,11 +810,12 @@ valide_Reg_Eco <- function(data) {
     return(FALSE)
   }
 
-  resultats <- data %>%
+  resultats <- as.data.frame(lazy_dt(data) %>%
     group_by(Placette) %>%
     reframe(
       valeur_unique = n_distinct(Reg_Eco) == 1
-    )
+    ))
+
   return(all(resultats$valeur_unique))
 }
 
@@ -811,20 +838,23 @@ valide_MSCR <- function(data) {
   if (!all(c("Vigueur", "MSCR") %in% names(data))) {
     return(FALSE)
   }
+
   if (length(data$Vigueur) == 0) {
     return(FALSE)
   }
+
   if (length(data$MSCR) == 0) {
     return(FALSE)
   }
+
   valeurs_autorisees <- c("M", "S", "C", "R", "MS", "CR")
 
   valeurs_null_NA <- c(NA, "")
 
-  resultats <- data %>%
+  resultats <- as.data.frame(lazy_dt(data) %>%
     mutate(
       condition_respectee = (MSCR %in% valeurs_autorisees | (MSCR %in% valeurs_null_NA & Vigueur %in% c(1, 2, 3, 4, 5, 6)))
-    )
+    ))
 
   return(all(resultats$condition_respectee))
 }
@@ -912,8 +942,9 @@ valide_Pente <- function(data) {
   resultats <- data %>%
     group_by(Placette) %>%
     reframe(
-      valeur_unique = n_distinct(Pente) == 1 && (all(Pente >= 0 & Pente <= 100) || is.na(Pente))
+      valeur_unique = n_distinct(Pente) == 1 && (all((Pente >= 0 & Pente <= 100) | is.na(Pente) == TRUE))
     )
+
   return(all(resultats$valeur_unique))
 }
 
@@ -1024,6 +1055,31 @@ verifier_arbre_uniques_par_placette <- function(data) {
     )
 
   return(all(resultats$tous_uniques))
+}
+
+valide_Annee_depart <- function(data) {
+  if (!all(c("Annee_Inventaire") %in% names(data))) {
+    data <- data %>% mutate(Annee_Inventaire = as.numeric(format(Sys.Date(), "%Y")))
+  }
+
+
+  placette_a_modifie <- data %>%
+    group_by(Placette) %>%
+    reframe(annees_uniques = n_distinct(Annee_Inventaire, na.rm = TRUE)) %>%
+    filter(annees_uniques > 1) %>%
+    pull(Placette)
+
+  # Appliquer les changements au dataframe
+  data <- data %>%
+    mutate(
+      Annee_Inventaire = case_when(
+        Placette %in% placette_a_modifie ~ as.numeric(format(Sys.Date(), "%Y")), # Remplacer les années incohérentes
+        is.na(Annee_Inventaire) ~ as.numeric(format(Sys.Date(), "%Y")), # Remplacer les années manquantes
+        TRUE ~ Annee_Inventaire
+      )
+    )
+
+  return(data)
 }
 
 

@@ -3,7 +3,11 @@ test_that(" Recrutement_Nb_lambda return the expected data ", {
   Para.rec_n_for_test <- readRDS(test_path("fixtures", "Para.rec_n_for_test.rds"))
 
   Result <- rec_lambda(
-    Rec = rec_lam_test, type_pe_Plac = "type0", st_tot0 = 21.5900825754271, t = 5, Iterj = 1L,
+    Rec = rec_lam_test,
+    type_pe_Plac = "type0",
+    st_tot0 = 21.5900825754271,
+    t = 5,
+    Iterj = 1L,
     Para.rec_n = Para.rec_n_for_test
   )
   Result <- data.frame(V1 = Result)

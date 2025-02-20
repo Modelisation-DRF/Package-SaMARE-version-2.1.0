@@ -25,27 +25,36 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
   select <- dplyr::select
 
   PlacQual <- PlacQual %>%
+    lazy_dt() %>%
     mutate(GrDHP = ifelse(DHPcm1 < 33.1, "C", ifelse(DHPcm1 >= 39.1 & GrEspece %in% c("BOJ", "ERS", "HEG"), "A", "B"))) %>%
     mutate(
       dtr = ifelse((DHPcm < 33.1 & DHPcm1 >= 33.1) | (DHPcm < 39.1 & DHPcm1 >= 39.1 & GrEspece %in% c("BOJ", "ERS", "HEG")), 1, 0),
       Intercept = 1
     ) %>%
-    mutate(ABCD = ifelse(GrEspece %in% c("ERR", "FIN", "FEN") & ABCD == "A", "B", ABCD))
+    mutate(ABCD = ifelse(GrEspece %in% c("ERR", "FIN", "FEN") & ABCD == "A", "B", ABCD)) %>%
+    as.data.frame()
 
   PlacQualB <- PlacQual %>%
+    lazy_dt() %>%
     filter(DHPcm1 >= 33.1) %>%
-    mutate(Intercept = 2)
+    mutate(Intercept = 2) %>%
+    as.data.frame()
+
   PlacQualA <- PlacQual %>%
+    lazy_dt() %>%
     filter(DHPcm1 >= 39.1 & GrEspece %in% c("BOJ", "ERS", "HEG")) %>%
-    mutate(Intercept = 3)
-  PlacQual <- rbind(PlacQual, PlacQualB, PlacQualA) %>% arrange(ArbreID, Intercept)
+    mutate(Intercept = 3) %>%
+    as.data.frame()
 
-
+  PlacQual <- PlacQual %>%
+    lazy_dt() %>%
+    rbind(PlacQualB, PlacQualA) %>%
+    arrange(ArbreID, Intercept) %>%
+    as.data.frame()
 
   n <- nrow(PlacQual)
 
   # Liste des effets
-
   listeRid1 <- c(rep("2o", n), rep("3a", n), rep("3b", n), rep("3c", n), rep("4e", n), rep("4o", n), rep("DU", n))
   listeType <- c(rep("type0", n), rep("type1", n))
   listeQualB <- c(rep("B", n), rep("C", n))
@@ -63,12 +72,10 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
   XBOJ[, 3:4] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "C" & type_pe_Plac == listeType)
   XBOJ[, 5:7] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "C" & PlacQual$vigu0 == listeVigueur & PlacQual$prod0 == listeProduits)
 
-
   XBOJ[, 8:9] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "B" & PlacQual$Intercept == listeInterceptB)
   XBOJ[, 10:11] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "B" & PlacQual$ABCD == listeQualB)
   XBOJ[, 12] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "B" & PlacQual$dtr == 1)
   XBOJ[, 13:15] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "B" & PlacQual$vigu0 == listeVigueur & PlacQual$prod0 == listeProduits)
-
 
   XBOJ[, 16:18] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "A" & PlacQual$Intercept == listeInterceptA)
   XBOJ[, 19:21] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "A" & PlacQual$ABCD == listeQualA)
@@ -76,7 +83,6 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
   XBOJ[, 24] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "A" & PlacQual$dtr == 1)
   XBOJ[, 25] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "A") * PlacQual$aam
   XBOJ[, 26:28] <- 1 * (PlacQual$GrEspece == "BOJ" & PlacQual$GrDHP == "A" & PlacQual$vigu0 == listeVigueur & PlacQual$prod0 == listeProduits)
-
 
   XERR <- matrix(0, ncol = 11, nrow = n)
   XERR[, 1] <- 1 * (PlacQual$GrEspece %in% c("ERR", "FIN") & PlacQual$GrDHP == "C")
@@ -95,14 +101,12 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
   XERS[, 5] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "C") * PlacQual$aam
   XERS[, 6:8] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "C" & PlacQual$vigu0 == listeVigueur & PlacQual$prod0 == listeProduits)
 
-
   XERS[, 9:10] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "B" & PlacQual$Intercept == listeInterceptB)
   XERS[, 11:12] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "B" & PlacQual$ABCD == listeQualB)
   XERS[, 13:14] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "B" & type_pe_Plac == listeType)
   XERS[, 15:17] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "B" & PlacQual$vigu0 == listeVigueur & PlacQual$prod0 == listeProduits)
   XERS[, 18] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "B" & PlacQual$dtr == 1)
   XERS[, 19] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "B") * PlacQual$aam
-
 
   XERS[, 20:22] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "A" & PlacQual$Intercept == listeInterceptA)
   XERS[, 23:25] <- 1 * (PlacQual$GrEspece == "ERS" & PlacQual$GrDHP == "A" & PlacQual$ABCD == listeQualA)
@@ -142,7 +146,6 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
 
   XTOT <- cbind(XBOJ, XERR, XERS, XFEN, XHEG)
 
-
   # Matrice des parametres
   BetaMat <- as.matrix(Para.EvolQualTot)
 
@@ -151,11 +154,14 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
   PlacQual$pred <- pred[, 1]
   PlacQual$predb <- ifelse(PlacQual$GrDHP == "C", exp(pred) / (1 + exp(pred)), 1 / (1 + exp(-pred)))
   PlacQualb <- PlacQual %>%
+    lazy_dt() %>%
     select(ArbreID, GrEspece, GrDHP, Intercept, predb, ABCD, vigu0, prod0, dtr) %>%
-    pivot_wider(id_cols = c("ArbreID", "GrEspece", "GrDHP", "ABCD", "vigu0", "prod0", "dtr"), values_from = predb, names_from = Intercept, names_prefix = "Intercept")
+    pivot_wider(id_cols = c("ArbreID", "GrEspece", "GrDHP", "ABCD", "vigu0", "prod0", "dtr"), values_from = predb, names_from = Intercept, names_prefix = "Intercept") %>%
+    as.data.frame()
 
   if ("A" %in% PlacQualb$GrDHP) {
     PlacQualb <- PlacQualb %>%
+      lazy_dt() %>%
       mutate(Alea = runif(n = nrow(PlacQualb))) %>%
       mutate(ABCD1 = ifelse(Alea <= Intercept1, "D",
         ifelse(GrDHP == "C", "C",
@@ -166,26 +172,29 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
           )
         )
       )) %>%
-      select(ArbreID, ABCD1)
+      select(ArbreID, ABCD1) %>%
+      as.data.frame()
   } else {
     if ("B" %in% PlacQualb$GrDHP) {
       PlacQualb <- PlacQualb %>%
+        lazy_dt() %>%
         mutate(Alea = runif(n = nrow(PlacQualb))) %>%
         mutate(ABCD1 = ifelse(Alea <= Intercept1, "D",
           ifelse(GrDHP == "C", "C",
             ifelse(Alea <= Intercept2, "C", "B")
           )
         )) %>%
-        select(ArbreID, ABCD1)
+        select(ArbreID, ABCD1) %>%
+        as.data.frame()
     } else {
       PlacQualb <- PlacQualb %>%
+        lazy_dt() %>%
         mutate(Alea = runif(n = nrow(PlacQualb))) %>%
         mutate(ABCD1 = ifelse(Alea <= Intercept1, "D", "C")) %>%
-        select(ArbreID, ABCD1)
+        select(ArbreID, ABCD1) %>%
+        as.data.frame()
     }
   }
-
-
 
   return(PlacQualb)
 }

@@ -31,17 +31,13 @@
 ratio_count_Gaules <- function(Ratio, Rec, RecGaules, t, st_tot0, latitude, longitude,
                                prec, trt, t0_aj_, Iterj, RandomPlacGaules, Para.ratio_gaules) {
   select <- dplyr::select
-
   n <- nrow(Ratio)
 
   # Liste des effets
-
-
   listeGrEss1 <- c(
     rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n), rep("ERS", n),
     rep("FEN", n), rep("FIN", n), rep("HEG", n), rep("RES", n), rep("SAB", n)
   )
-
 
   # Construction matrice X
   XRatio_count <- matrix(0, ncol = 18, nrow = n)
@@ -64,10 +60,12 @@ ratio_count_Gaules <- function(Ratio, Rec, RecGaules, t, st_tot0, latitude, long
   XRatio_count[, 17] <- t
   XRatio_count[, 18] <- longitude
 
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   ParaRatio_count <- Para.ratio_gaules %>%
-    filter(Iter == Iterj & response == "count")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "count") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(ParaRatio_count$ParameterEstimate, ncol = 1)
 

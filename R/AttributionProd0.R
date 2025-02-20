@@ -41,10 +41,7 @@ AttribProd0 <- function(Data, Para.ConvMSCRProd1024, Para.ConvMSCRProd24) {
         )
 
         listeGrMSCR <- c(rep("R", n), rep("C", n), rep("CR", n), rep("MS", n))
-        listeEss <- c(
-          rep("BOJ", n), rep("ERS", n), rep("FEN", n), rep("FIN", n),
-          rep("HEG", n)
-        )
+        listeEss <- c(rep("BOJ", n), rep("ERS", n), rep("FEN", n), rep("FIN", n), rep("HEG", n))
         listeInterMSCR1 <- c(rep("R", n * 2), rep("C", n * 2))
         listeInterEss1 <- c(rep("BOJ", n), rep("ERS", n))
         listeInterMSCR2 <- c(rep("CR", n * 5))

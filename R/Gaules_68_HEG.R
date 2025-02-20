@@ -22,11 +22,12 @@ pi68HEG <- function(RecGaules, Ratio, Rec, Iterj, RandomPlacGaules, Para.68_HEG)
   X68HEG_pi[, 2] <- RecGaules$lnNb_Gaules_Ess_Ha[which(RecGaules$GrEspece == "HEG")]
   X68HEG_pi[, 3] <- RecGaules$lnNb_Gaules_68_Ess_Ha[which(RecGaules$GrEspece == "HEG")]
 
-
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   Para68HEG_pi <- Para.68_HEG %>%
-    filter(Iter == Iterj & response == "pi")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "pi") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(Para68HEG_pi$ParameterEstimate, ncol = 1)
 
@@ -53,8 +54,6 @@ pi68HEG <- function(RecGaules, Ratio, Rec, Iterj, RandomPlacGaules, Para.68_HEG)
 #' @param Para.68_HEG Paramètres de l'équation de prévision du nombre de gaules de hêtre à grande feuille de 6 et 8 cm de diamètre
 #' @return Retourne une prévision du nombre de gaules de 6 et 8 cm de DHP de hêtre à grande feuille lorsquelles sont présentes
 #' @export
-
-
 count68HEG <- function(RecGaules, Ratio, Rec, Iterj, RandomPlacGaules, Para.68_HEG) {
   # Construction matrice X
   X68HEG_count <- matrix(0, ncol = 3, nrow = 1)
@@ -62,13 +61,12 @@ count68HEG <- function(RecGaules, Ratio, Rec, Iterj, RandomPlacGaules, Para.68_H
   X68HEG_count[, 2] <- RecGaules$lnNb_Gaules_68_Ess_Ha[which(RecGaules$GrEspece == "HEG")]
   X68HEG_count[, 3] <- RecGaules$lnNb_Gaules_24_Ess_Ha[which(RecGaules$GrEspece == "HEG")]
 
-
-
-
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   Para68HEG_count <- Para.68_HEG %>%
-    filter(Iter == Iterj & response == "count")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "count") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(Para68HEG_count$ParameterEstimate, ncol = 1)
 

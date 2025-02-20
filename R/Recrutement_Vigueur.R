@@ -15,7 +15,6 @@ rec_vig <- function(RecSelect, latitude, Iterj, Para.rec_vig) {
   n <- nrow(RecSelect)
 
   # Liste des effets
-
   listeEss <- c(
     rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n), rep("ERS", n),
     rep("FEN", n), rep("FIN", n), rep("HEG", n), rep("RES", n), rep("SAB", n)
@@ -28,8 +27,10 @@ rec_vig <- function(RecSelect, latitude, Iterj, Para.rec_vig) {
   Xrec_vig[, 12] <- latitude
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_vig <- Para.rec_vig %>%
-    filter(Iter == Iterj)
+  ParaRec_vig <- as.data.frame(
+    lazy_dt(Para.rec_vig) %>%
+      filter(Iter == Iterj)
+  )
 
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_vig$ParameterEstimate, ncol = 1)

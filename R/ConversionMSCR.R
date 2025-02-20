@@ -8,8 +8,6 @@
 #' @return Retourne un vecteur de probabilité que l'arbre soit vigoureux.
 #'
 #' @export
-#'
-
 ConvMSCRVig <- function(Data, Para.ConvMSCRVig) {
   select <- dplyr::select
   n <- nrow(Data)
@@ -53,9 +51,6 @@ ConvMSCRVig <- function(Data, Para.ConvMSCRVig) {
 #' @param Para.ConvMSCRProd1024 Un dataframe  contenant les paramettres des équations de conversion du classement MSCR en vigueur
 #' @return Retourne un vecteur de probabilité que l'arbre soit de classe de produit sciage
 #' @export
-#'
-#'
-
 ConvMSCRProd1024 <- function(Data, Para.ConvMSCRProd1024) {
   n <- nrow(Data)
 
@@ -96,8 +91,6 @@ ConvMSCRProd1024 <- function(Data, Para.ConvMSCRProd1024) {
   XConvMSCRProd1024[, 26:29] <- (Data$GrMSCR == listeInterMSCR3 & Data$GrEspeceMSCR == listeInterEss3) * 1
   XConvMSCRProd1024[, 30] <- Data$DHPcm^2
 
-
-
   # selectionner les parametres de conversion en vigeur
   Para.ConvMSCRProd1024 <- Para.ConvMSCRProd1024
 
@@ -106,7 +99,6 @@ ConvMSCRProd1024 <- function(Data, Para.ConvMSCRProd1024) {
 
   # Calcul
   logit <- as.vector(XConvMSCRProd1024 %*% BetaMat)
-
 
   pred <- exp(logit) / (1 + exp(logit))
 
@@ -120,10 +112,6 @@ ConvMSCRProd1024 <- function(Data, Para.ConvMSCRProd1024) {
 #' @param Para.ConvMSCRProd24 Un dataframe  contenant les paramettres des équations de conversion du classement MSCR en vigueur
 #' @return Retourne un vecteur de probabilité que l'arbre soit de classe de produit sciage
 #' @export
-#'
-#'
-
-
 ConvMSCRProd24 <- function(Data, Para.ConvMSCRProd24) {
   n <- nrow(Data)
 
@@ -148,8 +136,6 @@ ConvMSCRProd24 <- function(Data, Para.ConvMSCRProd24) {
   XConvMSCRProd24[, 2:5] <- (Data$GrMSCR == listeGrMSCR) * 1
   XConvMSCRProd24[, 10] <- Data$DHPcm
   XConvMSCRProd24[, 11] <- Data$DHPcm^2
-
-
 
   # selectionner les parametres de conversion en vigeur
   Para.ConvMSCRProd24 <- Para.ConvMSCRProd24

@@ -23,7 +23,6 @@
 #' }
 #'
 #' @export
-#'
 trouver_noms_absents <- function(Data) {
   ColOrdre <- c(
     "Placette", "NoArbre", "Espece", "Etat", "DHPcm", "Vigueur", "Nombre",
@@ -73,8 +72,6 @@ trouver_noms_absents_gaules <- function(Data) {
 
   return(noms_absents)
 }
-
-
 
 #' Renommer les colonnes  du fichier des arbres
 #'
@@ -128,8 +125,6 @@ renommer_les_colonnes <- function(data) {
   return(data)
 }
 
-
-
 #' Renommer les colonnes  du fichier des gaules
 #'
 #' La fonction \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
@@ -159,8 +154,6 @@ renommer_les_colonnes <- function(data) {
 #' # Le dataframe data_renomme aura les colonnes renommées et réorganisées selon ColOrdre.
 #' }
 #' @export
-
-
 renommer_les_colonnes_gaules <- function(data) {
   ColOrdre <- c("Placette", "Espece", "GrEspece", "DHPcm", "Nombre", "Sup_PE")
 
@@ -176,51 +169,3 @@ renommer_les_colonnes_gaules <- function(data) {
 
   return(data)
 }
-
-
-
-
-
-
-
-
-# cppFunction('
-# #include <Rcpp.h>
-# #include <string>
-# #include <cctype>
-# #include <algorithm>
-#
-# using namespace Rcpp;
-#
-# // Helper function to convert a string to lowercase
-# std::string to_lower(std::string str) {
-#     std::transform(str.begin(), str.end(), str.begin(),
-#                    [](unsigned char c){ return std::tolower(c); });
-#     return str;
-# }
-#
-# // Main function to find missing column names
-# // [[Rcpp::export]]
-# CharacterVector trouver_noms_absents1(DataFrame Data) {
-#     CharacterVector ColOrdre = CharacterVector::create("Placette","NoArbre","Espece","Etat","DHPcm","Vigueur","Nombre",
-#                                                       "Sup_PE","Annee_Coupe","Latitude","Longitude","Altitude","Pente",
-#                                                       "Reg_Eco","Type_Eco", "MSCR","ntrt","ABCD");
-#
-#     // Convert ColOrdre to lowercase
-#     for (int i = 0; i < ColOrdre.size(); ++i) {
-#         ColOrdre[i] = to_lower(as<std::string>(ColOrdre[i]));
-#     }
-#
-#     // Extract names from Data and convert to lowercase
-#     CharacterVector dataNames = Data.names();
-#     for (int i = 0; i < dataNames.size(); ++i) {
-#         dataNames[i] = to_lower(as<std::string>(dataNames[i]));
-#     }
-#
-#     // Find missing names
-#     CharacterVector noms_absents = setdiff(ColOrdre, dataNames);
-#
-#     return noms_absents;
-# }
-# ')
-#

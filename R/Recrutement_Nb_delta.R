@@ -24,7 +24,6 @@ rec_delta <- function(Rec, st_tot0, type_pe_Plac, ntrt, t0_aj_, Iterj, Para.rec_
   n <- nrow(Rec)
 
   # Liste des effets
-
   listeGrEssRec <- c(rep("sab", n), rep("heg", n), rep("feu", n), rep("rex", n))
 
   # Construction matrice X
@@ -42,11 +41,12 @@ rec_delta <- function(Rec, st_tot0, type_pe_Plac, ntrt, t0_aj_, Iterj, Para.rec_
   Xrec_delta[, 14] <- (Rec$GrEssRec == "rex") * Rec$logst_ess_1014
   Xrec_delta[, 15] <- (Rec$GrEssRec == "feu") * Rec$logst_ess_1014
 
-
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_delta <- Para.rec_n %>%
-    filter(Iter == Iterj & response == "delta")
+  ParaRec_delta <- as.data.frame(
+    lazy_dt(Para.rec_n) %>%
+      filter(Iter == Iterj & response == "delta")
+  )
+
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_delta$ParameterEstimate, ncol = 1)
 

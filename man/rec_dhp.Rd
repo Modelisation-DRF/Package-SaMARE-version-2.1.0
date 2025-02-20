@@ -7,24 +7,19 @@
 rec_dhp(RecSelect, st_tot0, dens_tot0, t, ntrt, Iterj, Para.rec_dhp)
 }
 \arguments{
-\item{RecSelect}{Dataframe qui contient les préviions du nomobre de recrues par
-groupe d'espèces.}
+\item{RecSelect}{Dataframe qui contient les préviions du nomobre de recrues par groupe d'espèces.}
 
-\item{st_tot0}{La surface terrière marchande de la placette en m2/ha au
-début du pas de simulation.}
+\item{st_tot0}{La surface terrière marchande de la placette en m2/ha au début du pas de simulation.}
 
-\item{dens_tot0}{Densitée totale de la placette en nb de tiges marchandes
-(>9.0cm) par hectare au début du pas de simulation.}
+\item{dens_tot0}{Densitée totale de la placette en nb de tiges marchandes (>9.0cm) par hectare au début du pas de simulation.}
 
 \item{t}{La longueur du pas de simulation en annees (en annees).}
 
-\item{ntrt}{Nombre de traitements de coupes partielles précédement
-effectuées sur la placette.}
+\item{ntrt}{Nombre de traitements de coupes partielles précédement effectuées sur la placette.}
 
 \item{Iterj}{Itération en cours.}
 
-\item{Para.rec_dhp}{Un dataframe  contenant les paramettres du module
-de prévision du DHP des recrues.}
+\item{Para.rec_dhp}{Un datatable  contenant les paramettres du module de prévision du DHP des recrues.}
 }
 \value{
 Retourne le prédicteur linéaire de l'équation du DHP des recrues

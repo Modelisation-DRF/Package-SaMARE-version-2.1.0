@@ -22,9 +22,6 @@
 #' @return Retourne une probabilité d'absence de gaules de 6 et 8 cm de DHP de
 #'         bouleau jaune.
 #' @export
-#'
-
-
 pi68BOJ <- function(RecGaules, Ratio, Rec, trt, t0_aj_, altitude, Iterj, RandomPlacGaules, Para.68_BOJ) {
   select <- dplyr::select
 
@@ -39,10 +36,12 @@ pi68BOJ <- function(RecGaules, Ratio, Rec, trt, t0_aj_, altitude, Iterj, RandomP
   X68BOJ_pi[, 7] <- ifelse(trt == "CP", t0_aj_, 0)
   X68BOJ_pi[, 8] <- altitude
 
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   Para68BOJ_pi <- Para.68_BOJ %>%
-    filter(Iter == Iterj & response == "pi")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "pi") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(Para68BOJ_pi$ParameterEstimate, ncol = 1)
 
@@ -72,8 +71,6 @@ pi68BOJ <- function(RecGaules, Ratio, Rec, trt, t0_aj_, altitude, Iterj, RandomP
 #' @param Para.68_BOJ Paramètre de l'équation de prévision du nombre de gaules de bouleau jaune de 6 et 8 cm de diamètre
 #' @return Retourne une prévision du nombre de gaules de 6 et 8 cm de DHP de bouleau jaune lorsquelles sont présentes
 #' @export
-#'
-
 count68BOJ <- function(RecGaules, Ratio, t, trt, t0_aj_, latitude, Iterj, RandomPlacGaules, Para.68_BOJ) {
   # Construction matrice X
   X68BOJ_count <- matrix(0, ncol = 7, nrow = 1)
@@ -85,11 +82,12 @@ count68BOJ <- function(RecGaules, Ratio, t, trt, t0_aj_, latitude, Iterj, Random
   X68BOJ_count[, 6] <- ifelse(trt == "CP", t0_aj_, 0)
   X68BOJ_count[, 7] <- latitude
 
-
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   Para68BOJ_count <- Para.68_BOJ %>%
-    filter(Iter == Iterj & response == "count")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "count") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(Para68BOJ_count$ParameterEstimate, ncol = 1)
 

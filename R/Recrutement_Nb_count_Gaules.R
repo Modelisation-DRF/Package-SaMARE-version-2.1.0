@@ -26,7 +26,6 @@ rec_count_Gaules <- function(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules
   n <- nrow(Rec)
 
   # Liste des effets
-
   listeGrEss1 <- c(rep("AUT", n), rep("FEN", n))
   listeGrEss2 <- c(rep("AUT", n), rep("SAB", n))
   listeGrEss3 <- c(rep("EPX", n), rep("ERR", n), rep("FEN", n), rep("FIN", n))
@@ -42,8 +41,11 @@ rec_count_Gaules <- function(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules
   Xrec_count[, 11:14] <- (RecGaules$GrEspece == listeGrEss4) * RecGaules$lnNb_Gaules_68_Ess_Ha
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_count <- Para.rec_gaules %>%
-    filter(Iter == Iterj & response == "count")
+  ParaRec_count <- as.data.frame(
+    lazy_dt(Para.rec_gaules) %>%
+      filter(Iter == Iterj & response == "count")
+  )
+
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_count$ParameterEstimate, ncol = 1)
 
@@ -53,7 +55,6 @@ rec_count_Gaules <- function(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules
   Random <- RandomPlacGaules$RandomPlac[which(RandomPlacGaules$SubModuleID == 10 & RandomPlacGaules$response == "count")]
 
   pred <- exp(logit + Random)
-
 
   return(pred)
 }

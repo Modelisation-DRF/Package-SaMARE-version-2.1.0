@@ -25,7 +25,6 @@ rec_pi_Gaules <- function(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules, P
   n <- nrow(Rec)
 
   # Liste des effets
-
   listeGrEss1 <- c(
     rep("AUT", n), rep("EPX", n), rep("ERR", n), rep("FEN", n),
     rep("FIN", n), rep("HEG", n), rep("RES", n)
@@ -42,8 +41,11 @@ rec_pi_Gaules <- function(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules, P
   Xrec_pi[, 11:14] <- (RecGaules$GrEspece == listeGrEss2) * RecGaules$lnNb_Gaules_68_Ess_Ha
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_pi <- Para.rec_gaules %>%
-    filter(Iter == Iterj & response == "pi")
+  ParaRec_pi <- as.data.frame(
+    lazy_dt(Para.rec_gaules) %>%
+      filter(Iter == Iterj & response == "pi")
+  )
+
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_pi$ParameterEstimate, ncol = 1)
 

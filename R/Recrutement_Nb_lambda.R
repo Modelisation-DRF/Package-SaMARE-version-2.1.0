@@ -20,7 +20,6 @@ rec_lambda <- function(Rec, type_pe_Plac, st_tot0, t, Iterj, Para.rec_n) {
   n <- nrow(Rec)
 
   # Liste des effets
-
   listeGrEssRec <- c(rep("sab", n), rep("heg", n), rep("feu", n), rep("rex", n))
 
   # Construction matrice X
@@ -35,11 +34,12 @@ rec_lambda <- function(Rec, type_pe_Plac, st_tot0, t, Iterj, Para.rec_n) {
   Xrec_lambda[, 11] <- (Rec$GrEssRec == "rex") * Rec$logst_ess_1014
   Xrec_lambda[, 12] <- (Rec$GrEssRec == "feu") * Rec$logst_ess_1014
 
-
-
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_lambda <- Para.rec_n %>%
-    filter(Iter == Iterj & response == "lambda")
+  ParaRec_lambda <- as.data.frame(
+    lazy_dt(Para.rec_n) %>%
+      filter(Iter == Iterj & response == "lambda")
+  )
+
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_lambda$ParameterEstimate, ncol = 1)
 

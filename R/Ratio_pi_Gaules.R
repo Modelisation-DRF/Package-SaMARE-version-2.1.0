@@ -26,17 +26,13 @@
 ratio_pi_Gaules <- function(Ratio, Rec, RecGaules, t, st_tot0, latitude, longitude,
                             Iterj, RandomPlacGaules, Para.ratio_gaules) {
   select <- dplyr::select
-
   n <- nrow(Ratio)
 
   # Liste des effets
-
-
   listeGrEss1 <- c(
     rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n),
     rep("FEN", n), rep("FIN", n), rep("SAB", n)
   )
-
 
   # Construction matrice X
   XRatio_pi <- matrix(0, ncol = 11, nrow = n)
@@ -48,7 +44,10 @@ ratio_pi_Gaules <- function(Ratio, Rec, RecGaules, t, st_tot0, latitude, longitu
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   ParaRatio_pi <- Para.ratio_gaules %>%
-    filter(Iter == Iterj & response == "pi")
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "pi") %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(ParaRatio_pi$ParameterEstimate, ncol = 1)
 

@@ -25,7 +25,6 @@ rec_pi <- function(Rec, t, st_tot0, ntrt, t0_aj_, type_pe_Plac, Iterj, Para.rec_
   n <- nrow(Rec)
 
   # Liste des effets
-
   listeGrEssRec <- c(rep("sab", n), rep("heg", n), rep("feu", n), rep("rex", n))
 
   # Construction matrice X
@@ -50,8 +49,11 @@ rec_pi <- function(Rec, t, st_tot0, ntrt, t0_aj_, type_pe_Plac, Iterj, Para.rec_
   Xrec_pi[, 21] <- ifelse(is.na(t0_aj_) == FALSE, t0_aj_, 0) * Rec$logst_ess_1014
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_pi <- Para.rec_n %>%
-    filter(Iter == Iterj & response == "pi")
+  ParaRec_pi <- as.data.frame(
+    lazy_dt(Para.rec_n) %>%
+      filter(Iter == Iterj & response == "pi")
+  )
+
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_pi$ParameterEstimate, ncol = 1)
 

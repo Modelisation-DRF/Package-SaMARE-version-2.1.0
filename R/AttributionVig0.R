@@ -47,7 +47,6 @@ AttribVigu0 <- function(Data, Para.ConvMSCRVig) {
       # Calcul
       logit <- as.vector(XConvMSCRVig %*% BetaMat)
 
-
       pred <- exp(logit) / (1 + exp(logit))
 
       vigu0 <- ifelse(pred >= runif(n = 1), "ViG", "NONVIG")

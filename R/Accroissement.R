@@ -61,7 +61,10 @@ accrois <- function(Accrois, st_tot0, t, fact_red, ntrt, type_pe_Plac, Iterj, Pa
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
   ParaAcci <- Para.acc %>%
-    filter(Iter == Iterj)
+    lazy_dt() %>%
+    filter(Iter == Iterj) %>%
+    as.data.frame()
+
   # Construction matrice beta
   BetaMat <- matrix(ParaAcci$ParameterEstimate, ncol = 1)
 

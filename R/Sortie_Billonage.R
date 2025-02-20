@@ -15,37 +15,44 @@
 #' @export
 
 SortieBillonage <- function(Data, Type) {
-  # Data=fic; Type="DHP2015"
-
   select <- dplyr::select
 
   # Petro a une équation pour CHR, attribuer CHR aux 3 autres especes de chenes
   # Si recrue de plus de 23 cm, elle n'a rien dans Espece, utiliser GrEspece (donc ça sera seulement ERS, ERR, BOJ, HEG qui passeront dans Petro, car les autres sont des groupes ou des ess pas de Petro)
   Data <- Data %>%
+    lazy_dt() %>%
     filter(DHPcm > 23) %>%
     mutate(
       Espece_original = Espece,
       Espece = ifelse(Espece %in% c("CHR", "CHG", "CHB", "CHE"), "CHR", Espece),
       Espece = ifelse(is.na(Espece), GrEspece, Espece)
-    )
+    ) %>%
+    as.data.frame()
 
-  # essences billonnage:         BOJ         ERR   ERS               HEG               CHR  BOP
-  # essences samare:      "AUT" "BOJ" "EPX" "ERR" "ERS" "FEN" "FIN" "HEG" "RES" "SAB"
-
-  data <- Data %>% filter(Espece %in% c("ERS", "BOJ", "ERR", "BOP", "HEG", "CHR")) # j'ai change CHX pour CHR car cette ligne ne fonctionnera jamais pour CHX, car le CHR est dans le Grespce FEN pour les recrues, et si on n'a l'espece original (pour les arbres qui sont là dès le départ, ça sera CHR, CHE, CHG ou CHB)
+  data <- Data %>%
+    lazy_dt() %>%
+    filter(Espece %in% c("ERS", "BOJ", "ERR", "BOP", "HEG", "CHR")) %>%
+    as.data.frame()
 
   if (nrow(data) == 0) {
-    Data <- Data %>% mutate(erreur = "Code d'essence a l'exterieur de la plage de valeurs possibles pour billonage")
+    Data <- Data %>%
+      lazy_dt() %>%
+      mutate(erreur = "Code d'essence a l'exterieur de la plage de valeurs possibles pour billonage") %>%
+      as.data.frame()
 
     return(Data)
   }
 
-  data1 <- data %>% mutate(bilonID = seq_len(nrow(data)))
-
+  data1 <- data %>%
+    lazy_dt() %>%
+    mutate(bilonID = seq_len(nrow(data))) %>%
+    as.data.frame()
 
   billo <- Billonage::SIMBillonnageABCD_DHP(data1, Type)
 
-  final <- left_join(data1, billo, by = "bilonID") %>%
+  final <- data1 %>%
+    lazy_dt() %>%
+    left_join(billo, by = "bilonID") %>%
     mutate(
       Stm2ha = pi * (DHPcm / 200)^2,
       Vigueur = case_when(
@@ -60,12 +67,16 @@ SortieBillonage <- function(Data, Type) {
       )
     ) %>%
     dplyr::select(-Espece) %>%
-    rename(Espece = Espece_original)
+    rename(Espece = Espece_original) %>%
+    as.data.frame()
 
-  final <- final %>% select(
-    Annee, Residuel, ArbreID, Iter, NoArbre, Placette, Nombre, GrEspece, Espece,
-    Etat, DHPcm, MSCR, hauteur_pred, vol_dm3, Stm2ha, Sup_PE, ABCD, Vigueur, DER, F1, F2, F3, F4, P, type
-  )
+  final <- final %>%
+    lazy_dt() %>%
+    select(
+      Annee, Residuel, ArbreID, Iter, NoArbre, Placette, Nombre, GrEspece, Espece,
+      Etat, DHPcm, MSCR, hauteur_pred, vol_dm3, Stm2ha, Sup_PE, ABCD, Vigueur, DER, F1, F2, F3, F4, P, type
+    ) %>%
+    as.data.frame()
 
 
   return(final)

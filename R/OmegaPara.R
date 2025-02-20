@@ -6,8 +6,6 @@
 #' @param symmetric Champ TRUE/FALSE qui indique si la matrice est symetrique
 #' @return Retourne une matrice de variance-covariance symetrique
 #' @export
-#'
-
 reconstruct <- function(m_lower, diag = TRUE, symmetric = TRUE) {
   select <- dplyr::select
 
@@ -23,6 +21,7 @@ reconstruct <- function(m_lower, diag = TRUE, symmetric = TRUE) {
   }
   return(m)
 }
+
 #' Fonction qui ajuste les paramètre des chaque itération en fonction de leur
 #' variance-covariance.
 #'
@@ -33,18 +32,20 @@ reconstruct <- function(m_lower, diag = TRUE, symmetric = TRUE) {
 #' @param NbIter Nombre d'iterations, corespond au nombre de version des
 #'               paramètres que l'on veut obtenir.
 #' @export
-#'
-#'
 ParaOmega <- function(ModuleID, ParaOri, ParaIter, Omega, NbIter) {
   select <- dplyr::select
   OmegaMod <- Omega %>%
+    lazy_dt() %>%
     filter(SubModuleID == ModuleID) %>%
+    as.data.frame() %>%
     .$ParameterEstimate
 
   OmegaMat <- reconstruct(OmegaMod, diag = TRUE, symmetric = TRUE)
 
   ParaMod <- ParaOri %>%
+    lazy_dt() %>%
     filter(SubModuleID == ModuleID & ParameterEstimate != 0) %>%
+    as.data.frame() %>%
     .$ParameterEstimate
 
 
@@ -52,53 +53,23 @@ ParaOmega <- function(ModuleID, ParaOri, ParaIter, Omega, NbIter) {
   beta <- as.vector(t(beta))
 
   ParaMod <- ParaIter %>%
-    filter(SubModuleID == ModuleID)
+    lazy_dt() %>%
+    filter(SubModuleID == ModuleID) %>%
+    as.data.frame()
 
   ParaModSans0 <- ParaMod %>%
+    lazy_dt() %>%
     filter(ParameterEstimate != 0) %>%
     select(-ParameterEstimate) %>%
-    dplyr::mutate(ParaRandom = beta)
+    dplyr::mutate(ParaRandom = beta) %>%
+    as.data.frame()
+
   suppressMessages(
-    ParaMod <- left_join(ParaMod, ParaModSans0) %>%
+    ParaMod <- ParaMod %>%
+      lazy_dt() %>%
+      left_join(ParaModSans0) %>%
       mutate(ParameterEstimate = ifelse(is.na(ParaRandom == TRUE), ParameterEstimate, ParaRandom)) %>%
-      select(-ParaRandom)
+      select(-ParaRandom) %>%
+      as.data.frame()
   )
 }
-
-
-#
-# Rcpp::cppFunction('
-#
-# #include <Rcpp.h>
-# using namespace Rcpp;
-#
-# // [[Rcpp::export]]
-# NumericMatrix reconstruct1(NumericVector m_lower, bool diag = true, bool symmetric = true) {
-#     int l = m_lower.size();
-#     int n = (sqrt(1 + 8*l) + (diag ? -1 : 1)) / 2;
-#     NumericMatrix m(n, n);
-#
-#     // Reconstruct
-#     int idx = 0;
-#     for (int i = 0; i < n; ++i) {
-#         for (int j = 0; j <= i; ++j) {
-#             if (diag || i != j) {
-#                 m(i, j) = m_lower[idx++];
-#             } else {
-#                 m(i, j) = 0; // Placeholder for diagonal elements if not filled
-#             }
-#         }
-#     }
-#
-#     if (symmetric) { // If symmetric, fill also upper half
-#         for (int i = 0; i < n; ++i) {
-#             for (int j = i + 1; j < n; ++j) {
-#                 m(i, j) = m(j, i);
-#             }
-#         }
-#     }
-#
-#     return m;
-# }
-#
-# ')

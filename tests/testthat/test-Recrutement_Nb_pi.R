@@ -6,6 +6,6 @@ test_that("multiplication works", {
   Result <- data.frame(V1 = Result)
   Result <- Result %>% mutate(V1 = round(V1, 7))
 
-  expectResult_test_Recrutement_Nb_pi <- readRDS(test_path("fixtures", "expectResult_test_Recrutement_Nb_pi.rds"))
-  expect_equal(Result, expectResult_test_Recrutement_Nb_pi)
+  expected <- readRDS(test_path("fixtures", "expectResult_test_Recrutement_Nb_pi.rds"))
+  expect_equal(Result, expected)
 })

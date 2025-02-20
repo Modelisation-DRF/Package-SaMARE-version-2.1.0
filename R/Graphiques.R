@@ -16,15 +16,18 @@
 #' @export
 #'
 Graph <- function(SimulHtVol, Espece = "TOT", Variable = "ST_HA", listePlacette) {
-  Data <- SortieDendroSamare(SimulHtVol) %>%
-    filter(GrEspece == Espece & Placette %in% listePlacette) %>%
-    mutate(Yvar = NA)
+  Data <- as.data.frame(
+    lazy_dt(SortieDendroSamare(SimulHtVol)) %>%
+      filter(GrEspece == Espece & Placette %in% listePlacette) %>%
+      mutate(Yvar = NA)
+  )
 
-  Data <- Data %>% # Permet de retirer le Residuel=0 dans le cas où on a également un résiduel=1 pour la même année
-    group_by(Placette, Annee) %>%
-    slice_tail() %>%
-    ungroup()
-
+  Data <- as.data.frame(
+    lazy_dt(Data) %>% # Permet de retirer le Residuel=0 dans le cas où on a également un résiduel=1 pour la même année
+      group_by(Placette, Annee) %>%
+      slice_tail() %>%
+      ungroup()
+  )
 
   if (Variable == "Vol_HA") {
     Data$Yvar <- Data$Vol_HA
@@ -54,33 +57,43 @@ Graph <- function(SimulHtVol, Espece = "TOT", Variable = "ST_HA", listePlacette)
   if (Espece == "TOT") {
     Essence <- "Toutes essences"
   }
+
   if (Espece == "BOJ") {
     Essence <- "Bouleau jaune"
   }
+
   if (Espece == "ERR") {
     Essence <- "\uC9rable rouge"
   }
+
   if (Espece == "ERS") {
     Essence <- "\uC9rable \uE0 sucre"
   }
+
   if (Espece == "FEN") {
     Essence <- "Feuillus nobles"
   }
+
   if (Espece == "FIN") {
     Essence <- "Feuillus intol\uE9rants"
   }
+
   if (Espece == "EPX") {
     Essence <- "\uC9pinettes"
   }
+
   if (Espece == "SAB") {
     Essence <- "Sapin baumier"
   }
+
   if (Espece == "RES") {
     Essence <- "R\uE9sineux"
   }
+
   if (Espece == "HEG") {
     Essence <- "H\uEAtre \uE0 grandes feuilles"
   }
+
   if (Espece == "AUT") {
     Essence <- "Autres essences"
   }
@@ -90,10 +103,12 @@ Graph <- function(SimulHtVol, Espece = "TOT", Variable = "ST_HA", listePlacette)
   AnneeDep <- min(Data$Annee)
   AnneeFin <- max(Data$Annee)
 
-  dernieres_valeurs <- Data %>%
-    group_by(Placette) %>%
-    slice(n()) %>%
-    ungroup()
+  dernieres_valeurs <- as.data.frame(
+    lazy_dt(Data) %>%
+      group_by(Placette) %>%
+      slice(n()) %>%
+      ungroup()
+  )
 
   GraphEvol <- Data %>%
     ggplot(aes(x = Annee, y = Yvar, group = Placette, label = Placette)) +
@@ -116,12 +131,13 @@ Graph <- function(SimulHtVol, Espece = "TOT", Variable = "ST_HA", listePlacette)
 
   NbPlac <- length(unique(SimulHtVol$Placette))
 
-  Sommaire <- Sommaire_Classes_DHP(SimulHtVol) %>%
-    filter((Annee %in% c(AnneeDep, AnneeFin)) & GrEspece == Espece & (Placette %in% listePlacette)) %>%
-    mutate(DHP_cl = round(DHP_cl / 5) * 5) %>%
-    group_by(Annee, DHP_cl) %>%
-    summarise(NbHa = (sum(NbHa) / NbPlac), .groups = "drop")
-
+  Sommaire <- as.data.frame(
+    lazy_dt(Sommaire_Classes_DHP(SimulHtVol)) %>%
+      filter((Annee %in% c(AnneeDep, AnneeFin)) & GrEspece == Espece & (Placette %in% listePlacette)) %>%
+      mutate(DHP_cl = round(DHP_cl / 5) * 5) %>%
+      group_by(Annee, DHP_cl) %>%
+      summarise(NbHa = (sum(NbHa) / NbPlac), .groups = "drop")
+  )
 
   MaxDHP <- max(Sommaire$DHP_cl)
 
