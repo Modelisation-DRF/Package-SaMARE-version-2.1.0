@@ -1,32 +1,21 @@
-#' Fonction qui qui prévoit la proportion du nombre de gaules par espèce pour la période
-#' de simulation suivante. Cette fonction est la deuxième partie du modèle zero-inflated
-#' de Rijal et al. 2023 et prévoit un ratio par groupe d'espèce lorsqu'il y a
-#' présence de gaules.
+#' Prévoit la proportion du nombre de gaules par espèce pour la période de simulation suivante. Cette fonction est la deuxième partie du modèle zero-inflated de Rijal et al. 2023 et prévoit un ratio par groupe d'espèce lorsqu'il y a présence de gaules.
 #'
-#' @param RecGaules Dataframe qui contient les informations sur la distribution
-#'                 des gaules dans la placette.
+#' @param RecGaules Dataframe qui contient les informations sur la distribution des gaules dans la placette.
 #' @param t La longueur du pas de simulation en annees (en annees).
-#' @param Rec    Un dataframe qui contient la prévision du nombre de recrues
-#'               par groupes d'espèces.
-#' @param trt  Variable distinguant les peuplements traités des témoins,
-#'              si St >26 = TEM.
-#' @param t0_aj_  Temps écoulé depuis la dernière coupe partielle.
-#' @param prec  Précipitations annuelles moyennes de la placette.
-#' @param Iterj  Itération en cours.
-#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à
-#'                          l'échelle de la placette du module de
-#'                          recrutement basé sur les gaules et du module d'évolution des gaules.
-#' @param st_tot0  Surface terrière marchande de la placette au début du pas
-#'                de simulation.
-#' @param latitude  Latitude de la placette en degrés décimal.
-#' @param longitude  Longitude de la placette en degrés décimal.
-#' @param Ratio Dataframe qui possède une ligne par groupe d'espèce dans lequel
-#'             les prévisions de ratios seront rapportées.
-#' @param Para.ratio_gaules Paramètres de l'équation de la prévision du ratio du
-#'                         nombre de gaules par espèce.
-#' @return  Retourne une prévision du ratio du nombre de gaules pour
-#'          chacun des groupes d'espèces lorsqu'il y a
-#'          présence de gaules de l'espèce.
+#' @param Rec Un dataframe qui contient la prévision du nombre de recrues par groupes d'espèces.
+#' @param trt Variable distinguant les peuplements traités des témoins, si St >26 = TEM.
+#' @param t0_aj_ Temps écoulé depuis la dernière coupe partielle.
+#' @param prec Précipitations annuelles moyennes de la placette.
+#' @param Iterj Itération en cours.
+#' @param RandomPlacGaules Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de recrutement basé sur les gaules et du module d'évolution des gaules.
+#' @param st_tot0 Surface terrière marchande de la placette au début du pas de simulation.
+#' @param latitude Latitude de la placette en degrés décimal.
+#' @param longitude Longitude de la placette en degrés décimal.
+#' @param Ratio Dataframe qui possède une ligne par groupe d'espèce dans lequel les prévisions de ratios seront rapportées.
+#' @param Para.ratio_gaules Paramètres de l'équation de la prévision du ratio du nombre de gaules par espèce.
+#'
+#' @return Une prévision du ratio du nombre de gaules pour chacun des groupes d'espèces lorsqu'il y a présence de gaules de l'espèce.
+#'
 #' @export
 ratio_count_Gaules <- function(Ratio, Rec, RecGaules, t, st_tot0, latitude, longitude,
                                prec, trt, t0_aj_, Iterj, RandomPlacGaules, Para.ratio_gaules) {
@@ -35,8 +24,16 @@ ratio_count_Gaules <- function(Ratio, Rec, RecGaules, t, st_tot0, latitude, long
 
   # Liste des effets
   listeGrEss1 <- c(
-    rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n), rep("ERS", n),
-    rep("FEN", n), rep("FIN", n), rep("HEG", n), rep("RES", n), rep("SAB", n)
+    rep("AUT", n),
+    rep("BOJ", n),
+    rep("EPX", n),
+    rep("ERR", n),
+    rep("ERS", n),
+    rep("FEN", n),
+    rep("FIN", n),
+    rep("HEG", n),
+    rep("RES", n),
+    rep("SAB", n)
   )
 
   # Construction matrice X

@@ -19,10 +19,7 @@
 #' @return Retourne la prévision d'accroissement diamétral en mm pour un pas de simulation.
 #'         Les    valeurs prédites sont faites sans effets aléatoires,
 #'         ceux-ci sont ajoutés dans la fonction SaMARE.
-
 #' @export
-
-
 accrois <- function(Accrois, st_tot0, t, fact_red, ntrt, type_pe_Plac, Iterj, Para.acc) {
   select <- dplyr::select
 
@@ -30,17 +27,32 @@ accrois <- function(Accrois, st_tot0, t, fact_red, ntrt, type_pe_Plac, Iterj, Pa
 
   # Liste des effets
   listeEss <- c(
-    rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n), rep("ERS", n),
-    rep("FEN", n), rep("FIN", n), rep("HEG", n), rep("RES", n), rep("SAB", n)
+    rep("AUT", n),
+    rep("BOJ", n),
+    rep("EPX", n),
+    rep("ERR", n),
+    rep("ERS", n),
+    rep("FEN", n),
+    rep("FIN", n),
+    rep("HEG", n),
+    rep("RES", n),
+    rep("SAB", n)
   )
   listeVigu0 <- c(rep("NONVIG", n), rep("ViG", n))
   listeProd0 <- c(rep("pate", n), rep("resineux", n), rep("sciage", n))
   listeNtrt <- c(rep(0, n), rep(1, n), rep(2, n))
   listeTypePe <- c(rep("type0", n), rep("type1", n), rep("type2", n))
   listeEssInter1 <- c(
-    rep("AUT", n * 3), rep("BOJ", n * 3), rep("EPX", n * 3), rep("ERR", n * 3),
-    rep("ERS", n * 3), rep("FEN", n * 3), rep("FIN", n * 3), rep("HEG", n * 3),
-    rep("RES", n * 3), rep("SAB", n * 3)
+    rep("AUT", n * 3),
+    rep("BOJ", n * 3),
+    rep("EPX", n * 3),
+    rep("ERR", n * 3),
+    rep("ERS", n * 3),
+    rep("FEN", n * 3),
+    rep("FIN", n * 3),
+    rep("HEG", n * 3),
+    rep("RES", n * 3),
+    rep("SAB", n * 3)
   )
 
   # Construction matrice X

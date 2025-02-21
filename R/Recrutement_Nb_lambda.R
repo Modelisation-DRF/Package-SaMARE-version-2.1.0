@@ -1,20 +1,15 @@
-#' Fonction qui prevoit le paramètre lambda de la fonction Weibull qui est
-#' la deuxième portion du modèles zero-inflated du nombre de recrues de SaMARE.
+#' Prevoit le paramètre lambda de la fonction Weibull qui est la deuxième portion du modèles zero-inflated du nombre de recrues de SaMARE.
 #'
-#' @param type_pe_Plac Variable indicatrice de la taille de la placette soit
-#'                     400 m2, entre 2500 et 5000 m2 inclusivement ou
-#'                     une autre dimension.
+#' @param type_pe_Plac Variable indicatrice de la taille de la placette soit 400 m2, entre 2500 et 5000 m2 inclusivement ou une autre dimension.
 #' @param t  La longueur du pas de simulation en annee (en annees).
-#' @param Rec  Un dataframe qui contient la prévision du nombre de recrues par
-#'             groupes d'espèces.
+#' @param Rec  Un dataframe qui contient la prévision du nombre de recrues par groupes d'espèces.
 #' @param Iterj Itération en cours.
-#' @param st_tot0  Surface terrière marchande (DHP >9.0cm) de la placette
-#'                 au début du pas de simulation.
-#' @param Para.rec_n  Paramètres de l'équation du nombre de recrues qui n'utilise
-#'                   pas les recrues comme prédicteurs.
-#' @return  Retourne le prédicteur linéaire du paramètre delta de la fonction
-#'          de prévision du nombre de recrues.
-
+#' @param st_tot0  Surface terrière marchande (DHP >9.0cm) de la placette au début du pas de simulation.
+#' @param Para.rec_n  Paramètres de l'équation du nombre de recrues qui n'utilise pas les recrues comme prédicteurs.
+#'
+#' @return  Le prédicteur linéaire du paramètre delta de la fonction de prévision du nombre de recrues.
+#'
+#' @export
 rec_lambda <- function(Rec, type_pe_Plac, st_tot0, t, Iterj, Para.rec_n) {
   select <- dplyr::select
   n <- nrow(Rec)
@@ -35,10 +30,10 @@ rec_lambda <- function(Rec, type_pe_Plac, st_tot0, t, Iterj, Para.rec_n) {
   Xrec_lambda[, 12] <- (Rec$GrEssRec == "feu") * Rec$logst_ess_1014
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_lambda <- as.data.frame(
-    lazy_dt(Para.rec_n) %>%
-      filter(Iter == Iterj & response == "lambda")
-  )
+  ParaRec_lambda <- Para.rec_n %>%
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "lambda") %>%
+    as.data.frame()
 
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_lambda$ParameterEstimate, ncol = 1)

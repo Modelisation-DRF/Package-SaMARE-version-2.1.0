@@ -67,7 +67,7 @@ EssenceID_Ht <- fread("data-raw/0_SpeciesHD.csv")
 EssenceID_Vol <- fread("data-raw/0_SpeciesVol.csv")
 
 VolMatchSpeciesGroups <- VolMatchSpeciesGroups[Species, on = "SpeciesID", nomatch = NULL][, -c("SpeciesID")]
-VolMatchSpeciesGroups <- VolMatchSpeciesGroups[SpeciesGroups, on ="SpeciesGroupID", nomatch = NULL][, -c("SpeciesGroupID", "OldID")]
+VolMatchSpeciesGroups <- VolMatchSpeciesGroups[SpeciesGroups, on = "SpeciesGroupID", nomatch = NULL][, -c("SpeciesGroupID", "OldID")]
 VolMatchSpeciesGroups <- VolMatchSpeciesGroups[EssenceID_Ht, on = "RelationHDSpeciesID", nomatch = NULL][, -c("RelationHDSpeciesID")]
 
 ass_ess_ht_vol <- setnames(VolMatchSpeciesGroups[EssenceID_Vol, on = "VolumeSpeciesID", nomatch = NULL], c("SpeciesName", "SpeciesGroupName"), c("Espece", "GrEspece"))

@@ -1,8 +1,6 @@
-#' Vérifier la présence des colonnes obligatoires dans le fichier d'arbres
+#' Vérifie la présence des colonnes obligatoires dans le fichier d'arbres
 #'
-#' La fonction \code{trouver_noms_absents} vérifie si toutes les colonnes obligatoires
-#' sont présentes dans un dataframe représentant le fichier d'arbres. Elle retourne une liste
-#' des noms des colonnes manquantes, le cas échéant.
+#' \code{trouver_noms_absents} vérifie si toutes les colonnes obligatoires sont présentes dans un dataframe représentant le fichier d'arbres. Elle retourne une liste des noms des colonnes manquantes, le cas échéant.
 #'
 #' @param Data Un dataframe représentant le fichier d'arbres.
 #'
@@ -25,8 +23,24 @@
 #' @export
 trouver_noms_absents <- function(Data) {
   ColOrdre <- c(
-    "Placette", "NoArbre", "Espece", "Etat", "DHPcm", "Vigueur", "Nombre",
-    "Sup_PE", "Annee_Coupe", "Latitude", "Longitude", "Altitude", "Pente", "Reg_Eco", "Type_Eco", "MSCR", "ntrt", "ABCD"
+    "Placette",
+    "NoArbre",
+    "Espece",
+    "Etat",
+    "DHPcm",
+    "Vigueur",
+    "Nombre",
+    "Sup_PE",
+    "Annee_Coupe",
+    "Latitude",
+    "Longitude",
+    "Altitude",
+    "Pente",
+    "Reg_Eco",
+    "Type_Eco",
+    "MSCR",
+    "ntrt",
+    "ABCD"
   )
 
   names(Data) <- tolower(names(Data))
@@ -38,11 +52,8 @@ trouver_noms_absents <- function(Data) {
   return(noms_absents)
 }
 
-#' Vérifier la présence des colonnes obligatoires dans le fichier des gaules
-#'
-#' La fonction \code{trouver_noms_absents_gaules} vérifie si toutes les colonnes obligatoires
-#' sont présentes dans un dataframe représentant le fichier des gaules. Elle retourne une liste
-#' des noms des colonnes manquantes, le cas échéant.
+#' Vérifie la présence des colonnes obligatoires dans le fichier des gaules#'
+#' \code{trouver_noms_absents_gaules} vérifie si toutes les colonnes obligatoires sont présentes dans un dataframe représentant le fichier des gaules. Elle retourne une liste des noms des colonnes manquantes, le cas échéant.
 #'
 #' @param Data Un dataframe représentant le fichier des gaules.
 #'
@@ -73,12 +84,10 @@ trouver_noms_absents_gaules <- function(Data) {
   return(noms_absents)
 }
 
-#' Renommer les colonnes  du fichier des arbres
-#'
-#' La fonction \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
+#' Renomme les colonnes  du fichier des arbres#'
+#' \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
 #'
 #' @param data Un dataframe, représentant le fichier des arbres, dont les colonnes doivent être renommées et réorganisées.
-#'
 #'
 #' @details
 #' La fonction suit les étapes suivantes :
@@ -107,9 +116,27 @@ trouver_noms_absents_gaules <- function(Data) {
 #' @export
 renommer_les_colonnes <- function(data) {
   ColOrdre <- c(
-    "Placette", "NoArbre", "Espece", "Etat", "DHPcm", "Vigueur", "Nombre",
-    "Sup_PE", "Annee_Coupe", "Latitude", "Longitude", "Altitude", "Pente", "Ptot", "Tmoy",
-    "GrwDays", "Reg_Eco", "Type_Eco", "MSCR", "ntrt", "ABCD"
+    "Placette",
+    "NoArbre",
+    "Espece",
+    "Etat",
+    "DHPcm",
+    "Vigueur",
+    "Nombre",
+    "Sup_PE",
+    "Annee_Coupe",
+    "Latitude",
+    "Longitude",
+    "Altitude",
+    "Pente",
+    "Ptot",
+    "Tmoy",
+    "GrwDays",
+    "Reg_Eco",
+    "Type_Eco",
+    "MSCR",
+    "ntrt",
+    "ABCD"
   )
 
   noms_colonnes_existants <- tolower(names(data))
@@ -125,12 +152,10 @@ renommer_les_colonnes <- function(data) {
   return(data)
 }
 
-#' Renommer les colonnes  du fichier des gaules
-#'
-#' La fonction \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
+#' Renomme les colonnes  du fichier des gaules
+#' \code{renommer_les_colonnes} renomme les colonnes d'un dataframe
 #'
 #' @param data Un dataframe, représentant le fichier des gaules, dont les colonnes doivent être renommées et réorganisées.
-#'
 #'
 #' @details
 #' La fonction suit les étapes suivantes :

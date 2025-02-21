@@ -1,26 +1,16 @@
-#' Fonction qui prévoit l'évolution de la classe de qualité des arbres.
-#' La fonction se base sur les équation des Filip Havreljuk pour SaMARE 2018
-#' elle ne prévoit pas la qualité des arbre qu n'ont pas de valeur de qualité dans
-#' les données d'origines (ex. arbres qui passent le seuil de la classe de 24 cm".
-
-
-
-
-#' @param PlacQual Un dataframe qui contient les arbres pour lesquels on veut
-#'             prévoir l'évolution de la classe de qualité des arbres.
-#' @param type_pe_Plac Variable indicatrice de la taille de la placette soit
-#'                      400 m2, soit entre 2500 et 5000 m2 inclusivement ou
-#'                      une autre dimension.
+#' Prévoit l'évolution de la classe de qualité des arbres.
+#' La fonction se base sur les équation des Filip Havreljuk pour SaMARE 2018 elle ne prévoit pas la qualité des arbre qu n'ont pas de valeur de qualité dans les données d'origines (ex. arbres qui passent le seuil de la classe de 24 cm".
 #'
+#' @param PlacQual Un dataframe qui contient les arbres pour lesquels on veut prévoir l'évolution de la classe de qualité des arbres.
+#' @param type_pe_Plac Variable indicatrice de la taille de la placette soit 400 m2, soit entre 2500 et 5000 m2 inclusivement ou une autre dimension.
 #' @param prec Précipitations annuelles moyennes.
 #' @param rid1 variable de groupement de variables écologiques.
 #' @param dens_tot0 Densité totale en arbres marchands.
-#' @param Para.EvolQualTot Un dataframe  contenant les paramétrés du module d'évolution
-#'                 de la qualité des arbres.
-#' @return  Le numéro d'arbre avec la qualité prédite".
-#' @export
+#' @param Para.EvolQualTot Un dataframe  contenant les paramétrés du module d'évolution de la qualité des arbres.
 #'
-
+#' @return  Le numéro d'arbre avec la qualité prédite".
+#'
+#' @export
 EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQualTot) {
   select <- dplyr::select
 
@@ -143,6 +133,13 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
   XHEG[, 26:27] <- 1 * (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "A" & type_pe_Plac == listeType)
   XHEG[, 28] <- (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "A") * prec
   XHEG[, 29:31] <- 1 * (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "A" & PlacQual$vigu0 == listeVigueur & PlacQual$prod0 == listeProduits)
+
+  XHEG[, 9:10] <- 1 * (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "B" & PlacQual$Intercept == listeInterceptB)
+  XHEG[, 11:12] <- 1 * (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "B" & PlacQual$ABCD == listeQualB)
+  XHEG[, 13:14] <- 1 * (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "B" & type_pe_Plac == listeType)
+  XHEG[, 15] <- (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "B") * prec
+  XHEG[, 16:18] <- 1 * (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "B" & PlacQual$vigu0 == listeVigueur & PlacQual$prod0 == listeProduits)
+  XHEG[, 19] <- 1 * (PlacQual$GrEspece == "HEG" & PlacQual$GrDHP == "B") * PlacQual$aam
 
   XTOT <- cbind(XBOJ, XERR, XERS, XFEN, XHEG)
 

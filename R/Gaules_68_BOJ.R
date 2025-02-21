@@ -1,26 +1,17 @@
-#' Fonction qui calcul la probabilité d'absence de Gaules de bouleau jaune classes
-#' de 6 ou 8 cm de diamètre. Cette fonction utilise une variante des paramètre
-#' publiée par Rijal et al. 2023 Journal canadien de la recherche forestière.
-#' Les prévisions sont basées sur un modèle de type Zero inflated.
+#' Calcule la probabilité d'absence de Gaules de bouleau jaune classes de 6 ou 8 cm de diamètre. Cette fonction utilise une variante des paramètre publiée par Rijal et al. 2023 Journal canadien de la recherche forestière. Les prévisions sont basées sur un modèle de type Zero inflated.
 #'
-#' @param RecGaules Dataframe qui contient les informations sur la distribution
-#'                 des gaules dans la placette.
-#' @param Ratio   Un dataframe qui contient la répartition du nombre de gaules
-#'               prédit entre les groupes d'espèces.
-#' @param Rec    Un dataframe qui contient la prévision du nombre de recrues par
-#'               groupes d'espèces.
-#' @param trt    Variable distinguant les peuplements traités des témoins, si
-#'                St >26 = TEM.
+#' @param RecGaules Dataframe qui contient les informations sur la distribution des gaules dans la placette.
+#' @param Ratio   Un dataframe qui contient la répartition du nombre de gaules prédit entre les groupes d'espèces.
+#' @param Rec    Un dataframe qui contient la prévision du nombre de recrues par groupes d'espèces.
+#' @param trt    Variable distinguant les peuplements traités des témoins, si St >26 = TEM.
 #' @param t0_aj_  Temps écoulé depuis la dernière coupe partielle.
 #' @param altitude Altitude de la placette.
 #' @param Iterj  Itération en cours.
-#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle
-#'                           de la placette du module de recrutement basé sur
-#'                           les gaules et du module d'évolution des gaules.
-#' @param Para.68_BOJ Paramètres de l'équation de prévision du nombre de gaules
-#'                   de bouleau jaune de 6 et 8 cm de diamètre.
-#' @return Retourne une probabilité d'absence de gaules de 6 et 8 cm de DHP de
-#'         bouleau jaune.
+#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de recrutement basé sur les gaules et du module d'évolution des gaules.
+#' @param Para.68_BOJ Paramètres de l'équation de prévision du nombre de gaules de bouleau jaune de 6 et 8 cm de diamètre.
+#'
+#' @return Une probabilité d'absence de gaules de 6 et 8 cm de DHP de bouleau jaune.
+#'
 #' @export
 pi68BOJ <- function(RecGaules, Ratio, Rec, trt, t0_aj_, altitude, Iterj, RandomPlacGaules, Para.68_BOJ) {
   select <- dplyr::select
@@ -55,9 +46,7 @@ pi68BOJ <- function(RecGaules, Ratio, Rec, trt, t0_aj_, altitude, Iterj, RandomP
   return(pred)
 }
 
-#' Fonction qui calcul le nombre de Gaules de bouleau jaune classes de 6 ou 8 cm de diamètre lorsquelle sont présente.
-#' Cette fonction utilise une variante des paramètre publiée par Rijal et al. 2023 Journal canadien de la recherche forestière.
-#' Les prévisions sont basées sur un modèle de type Zero inflated
+#' Calcule le nombre de Gaules de bouleau jaune classes de 6 ou 8 cm de diamètre lorsquelle sont présente. Cette fonction utilise une variante des paramètre publiée par Rijal et al. 2023 Journal canadien de la recherche forestière. Les prévisions sont basées sur un modèle de type Zero inflated
 #'
 #' @param RecGaules Dataframe qui contient les information sur la distribution des gaules dans la placette
 #' @param Ratio   Un dataframe qui contient la répartition du nombre de gaule prédit entre les groupes d'espèces
@@ -66,10 +55,11 @@ pi68BOJ <- function(RecGaules, Ratio, Rec, trt, t0_aj_, altitude, Iterj, RandomP
 #' @param t0_aj_     Temps écoulé depuis la dernière coupe partielle
 #' @param latitude Latitude de la placette
 #' @param Iterj  Itération en cours
-#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de
-#'                          recrutement basé sur les gaules et du module d'évolution des gaules
+#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de recrutement basé sur les gaules et du module d'évolution des gaules
 #' @param Para.68_BOJ Paramètre de l'équation de prévision du nombre de gaules de bouleau jaune de 6 et 8 cm de diamètre
-#' @return Retourne une prévision du nombre de gaules de 6 et 8 cm de DHP de bouleau jaune lorsquelles sont présentes
+#'
+#' @return Une prévision du nombre de gaules de 6 et 8 cm de DHP de bouleau jaune lorsquelles sont présentes
+#'
 #' @export
 count68BOJ <- function(RecGaules, Ratio, t, trt, t0_aj_, latitude, Iterj, RandomPlacGaules, Para.68_BOJ) {
   # Construction matrice X

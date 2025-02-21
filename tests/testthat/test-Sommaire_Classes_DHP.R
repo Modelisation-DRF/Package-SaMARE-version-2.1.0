@@ -5,7 +5,7 @@ test_that("Sommaire_Classes_DHP return the expected data frame", {
     mutate(across(where(is.numeric), ~ round(., 6))) %>%
     ungroup()
 
-  expected <- readRDS(test_path("fixtures", "expect_for_arbre_sommaire_classes_DHP.rds"))
+  expected <- as.data.frame(readRDS(test_path("fixtures", "expect_for_arbre_sommaire_classes_DHP.rds")))
   expected <- expected %>%
     mutate(across(where(is.numeric), ~ round(., 6))) %>%
     ungroup()

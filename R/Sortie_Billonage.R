@@ -1,20 +1,19 @@
-#' Fonction qui structure un dataframe de sortie dont chaque ligne correspond
-#' à chacun des arbres par placette, par classe Petro, par itération et par année.
+#' Structure un dataframe de sortie dont chaque ligne correspond à chacun des arbres par placette, par classe Petro, par itération et par année.
 #'
-#' @param Data Un dataframe qui contient en ligne les arbres dont on veut prévoir
-#'             les rendements en produit à l'aide du module de billonnage Petro
-#'             régionalisé. sera applier sur "ERS", "BOJ", "ERR", "BOP", "HEG", "CHR"
-#' @param Type "DHP" pour utiliser les équations régionalisées basées seulement sur le DHP
-#'             "ABCD" pour utiliser les équations régionalisées basées sur ABCD
-#'             "1234" pour utiliser les équations de 2015 basées sur 1234
-#'             "MSCR" pour utiliser les équations de 2015 basées sur MSCR
-#'             "DHP2015" pour utiliser les équations de 2015 basées seulement sur le DHP
-#'             "ABCD2015" pour utiliser les équations de 2015 basées sur ABCD
-#' @return Retourne un dataframe avec l'estimation du volume par classe de produit
-#'          pour chacun des arbres feuillus.
+#' @param Data Un dataframe qui contient en ligne les arbres dont on veut prévoir les rendements en produit à l'aide du module de billonnage Petro régionalisé. sera applier sur "ERS", "BOJ", "ERR", "BOP", "HEG", "CHR"
+#' @param Type
+#'  "DHP" pour utiliser les équations régionalisées basées seulement sur le DHP
+#'  "ABCD" pour utiliser les équations régionalisées basées sur ABCD
+#'  "1234" pour utiliser les équations de 2015 basées sur 1234
+#'  "MSCR" pour utiliser les équations de 2015 basées sur MSCR
+#'  "DHP2015" pour utiliser les équations de 2015 basées seulement sur le DHP
+#'  "ABCD2015" pour utiliser les équations de 2015 basées sur ABCD
+#'
+#' @return Un dataframe avec l'estimation du volume par classe de produit pour chacun des arbres feuillus.
+#'
 #' @export
-
 SortieBillonage <- function(Data, Type) {
+  # Data=fic; Type="DHP2015"
   select <- dplyr::select
 
   # Petro a une équation pour CHR, attribuer CHR aux 3 autres especes de chenes

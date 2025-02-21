@@ -1,14 +1,13 @@
-#' Fonction qui calcul la probabilité d'absence de Gaules d'érable à sucre classes de 6 ou 8 cm de diamètre.
-#' Cette fonction utilise une variante des paramètre publiée par Rijal et al. 2023 Journal canadien de la recherche forestière
-#' Les prévisions sont basées sur un modèle de type Zero inflated
+#' Calcule la probabilité d'absence de Gaules d'érable à sucre classes de 6 ou 8 cm de diamètre. Cette fonction utilise une variante des paramètre publiée par Rijal et al. 2023 Journal canadien de la recherche forestière Les prévisions sont basées sur un modèle de type Zero inflated
 #'
 #' @param RecGaules Dataframe qui contient les information sur la distribution des gaules dans la placette
 #' @param Ratio   Un dataframe qui contient la répartition du nombre de gaule prédit entre les groupes d'espèces
 #' @param Iterj  Itération en cours
-#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de
-#'                          recrutement basé sur les gaules et du module d'évolution des gaules
+#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de recrutement basé sur les gaules et du module d'évolution des gaules
 #' @param Para.68_ERS Paramètres de l'équation de prévision du nombre de gaules d'érable à sucre de 6 et 8 cm de diamètre
-#' @return Retourne une probabilité d'absence de gaules de 6 et 8 cm de DHP d'érable à sucre
+#'
+#' @return Une probabilité d'absence de gaules de 6 et 8 cm de DHP d'érable à sucre
+#'
 #' @export
 pi68ERS <- function(RecGaules, Ratio, Iterj, RandomPlacGaules, Para.68_ERS) {
   select <- dplyr::select
@@ -39,19 +38,18 @@ pi68ERS <- function(RecGaules, Ratio, Iterj, RandomPlacGaules, Para.68_ERS) {
   return(pred)
 }
 
-#' Fonction qui calcul le nombre de Gaules d'érable à sucre classes de 6 ou 8 cm de diamètre lorsquelle sont présente.
-#' Cette fonction utilise une variante des paramètre publiée par Rijal et al. 2023 Journal canadien de la recherche forestière.
-#' Les prévisions sont basées sur un modèle de type Zero inflated
+#' Calcule le nombre de Gaules d'érable à sucre classes de 6 ou 8 cm de diamètre lorsquelle sont présente. Cette fonction utilise une variante des paramètre publiée par Rijal et al. 2023 Journal canadien de la recherche forestière. Les prévisions sont basées sur un modèle de type Zero inflated
 #'
 #' @param RecGaules Dataframe qui contient les information sur la distribution des gaules dans la placette
 #' @param Ratio   Un dataframe qui contient la répartition du nombre de gaule prédit entre les groupes d'espèces
 #' @param dens_tot0 Densité totale
 #' @param grwd nombre de jours dans la saison de croissance
 #' @param Iterj  Itération en cours
-#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de
-#'                          recrutement basé sur les gaules et du module d'évolution des gaules
+#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de recrutement basé sur les gaules et du module d'évolution des gaules
 #' @param Para.68_ERS Paramètres de l'équation de prévision du nombre de gaules d'érable à sucre de 6 et 8 cm de diamètre
-#' @return Retourne une prévision du nombre de gaules de 6 et 8 cm de DHP d'érable à sucre lorsquelles sont présentes
+#'
+#' @return Une prévision du nombre de gaules de 6 et 8 cm de DHP d'érable à sucre lorsquelles sont présentes
+#'
 #' @export
 count68ERS <- function(RecGaules, Ratio, dens_tot0, grwd, Iterj, RandomPlacGaules, Para.68_ERS) {
   # Construction matrice X

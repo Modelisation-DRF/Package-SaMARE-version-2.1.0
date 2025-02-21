@@ -1,16 +1,11 @@
-#' Fonction qui attribue la classe MSCR. La fonction
-#' applique les équations de 2006 pour les feuillus puis celle de SaMARE2018
-#' pour les résineux puisqu'elle sépare les épinettes des résineux.
+#' Attribue la classe MSCR. La fonction applique les équations de 2006 pour les feuillus puis celle de SaMARE2018 pour les résineux puisqu'elle sépare les épinettes des résineux.
 #'
-#' @param Data Un dataframe contenant une ligne par arbre pour lesquels on
-#'              veut attribuer la vigueur.
-#' @param Para.ConvVigMSCR Un dataframe contenant les paramètres des équations
-#'                         de conversion de vigueur en MSCR.
-#' @return Retourne le classement MSCR de l'arbre.
-
+#' @param Data Un dataframe contenant une ligne par arbre pour lesquels on veut attribuer la vigueur.
+#' @param Para.ConvVigMSCR Un dataframe contenant les paramètres des équations de conversion de vigueur en MSCR.
+#'
+#' @return Le classement MSCR de l'arbre.
+#'
 #' @export
-
-
 AttribMSCR <- function(Data, Para.ConvVigMSCR) {
   select <- dplyr::select
 
@@ -33,10 +28,12 @@ AttribMSCR <- function(Data, Para.ConvVigMSCR) {
       lazy_dt() %>%
       filter(SubModuleID == 20 & response == 1) %>%
       as.data.frame()
+
     Para.ConvVigMSCR2 <- Para.ConvVigMSCR %>%
       lazy_dt() %>%
       filter(SubModuleID == 20 & response == 2) %>%
       as.data.frame()
+
     Para.ConvVigMSCR3 <- Para.ConvVigMSCR %>%
       lazy_dt() %>%
       filter(SubModuleID == 20 & response == 3) %>%
@@ -55,6 +52,7 @@ AttribMSCR <- function(Data, Para.ConvVigMSCR) {
     probM <- pred1 / (1 + pred1 + pred2 + pred3)
     probS <- probM + pred2 / (1 + pred1 + pred2 + pred3)
     probC <- probS + pred3 / (1 + pred1 + pred2 + pred3)
+
     # probR=1/(1+pred1+pred2+pred3)
     Alea <- runif(n = n)
     MSCR <- ifelse(Alea < probM, "M", ifelse(Alea < probS, "S", ifelse(Alea < probC, "C", "R")))
@@ -75,10 +73,12 @@ AttribMSCR <- function(Data, Para.ConvVigMSCR) {
       lazy_dt() %>%
       filter(SubModuleID == 21 & response == 1) %>%
       as.data.frame()
+
     Para.ConvVigMSCR2 <- Para.ConvVigMSCR %>%
       lazy_dt() %>%
       filter(SubModuleID == 21 & response == 2) %>%
       as.data.frame()
+
     Para.ConvVigMSCR3 <- Para.ConvVigMSCR %>%
       lazy_dt() %>%
       filter(SubModuleID == 21 & response == 3) %>%
@@ -97,6 +97,7 @@ AttribMSCR <- function(Data, Para.ConvVigMSCR) {
     probM <- pred1 / (1 + pred1 + pred2 + pred3)
     probS <- probM + pred2 / (1 + pred1 + pred2 + pred3)
     probC <- probS + pred3 / (1 + pred1 + pred2 + pred3)
+
     # probR=1/(1+pred1+pred2+pred3)
     Alea <- runif(n = n)
     MSCR <- ifelse(Alea < probM, "M", ifelse(Alea < probS, "S", ifelse(Alea < probC, "C", "R")))

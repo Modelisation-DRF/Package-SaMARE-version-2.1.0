@@ -1,28 +1,17 @@
-#' Fonction qui prévoit la probabilité de mortalité de chacun des arbres
-#' durant un pas de simulation.
+#' Prévoit la probabilité de mortalité de chacun des arbres durant un pas de simulation.
 #'
-#' @param Mort Un dataframe qui contient la liste des arbres pour lesquels
-#'            la probabilité de mortalité doit être évaluée ainsi que les
-#'            caractéristiques de ses arbres qui seront utilisées
-#'            pour en prévoir le risque de mortalité.
+#' @param Mort Un dataframe qui contient la liste des arbres pour lesquels la probabilité de mortalité doit être évaluée ainsi que les caractéristiques de ses arbres qui seront utilisées pour en prévoir le risque de mortalité.
 #' @param trt  Variable distinguant les peuplements traités des témoins, si St >26 = TEM.
 #' @param temp  Température annuelle moyenne de la placette.
-#' @param type_pe_Plac Variable indicatrice de la taille de la placette soit
-#'                     400 m2, entre 2500 et 5000 m2 inclusivement ou
-#'                     une autre dimension.
-#' @param fact_red  Facteur de correction appliqué lorsqu'une coupe partielle a
-#'                   été effectuée 3 ans ou moins avant la prévision.
+#' @param type_pe_Plac Variable indicatrice de la taille de la placette soit 400 m2, entre 2500 et 5000 m2 inclusivement ou une autre dimension.
+#' @param fact_red  Facteur de correction appliqué lorsqu'une coupe partielle a été effectuée 3 ans ou moins avant la prévision.
 #' @param t La longueur du pas de simulation en annee (en annees).
 #' @param Iterj  Itération en cours.
-#' @param MCH Variable prenant la veleur de 1 en présence de maladie corticale du hêtre dans
-#'            la placette et 0 lorsque la maladie est absente. Lorsque la maladie corticale
-#'            est présente,la probabilité de mortalié des hêtres est estimée avec
-#'            l'équation de l'avis technique AT-SSRF 20 de la Direction de la recherche forestière.
+#' @param MCH Variable prenant la veleur de 1 en présence de maladie corticale du hêtre dans la placette et 0 lorsque la maladie est absente. Lorsque la maladie corticale est présente,la probabilité de mortalié des hêtres est estimée avec l'équation de l'avis technique AT-SSRF 20 de la Direction de la recherche forestière.
 #' @param Para.mort Un dataframe  contenant les paramettres du module de mortalité.
-#' @return Retourne le prédicteur linéaire de l'équation de la prévision du
-#'         risque de mortalité. Les valeurs présites sont faites sans effets
-#'         aléatoires, ceux-ci sont ajoutés dans la fonction SaMARE avant
-#'         de convertir le prédicteur linéaire en probabilité de mortalité.
+#'
+#' @return Le prédicteur linéaire de l'équation de la prévision du risque de mortalité. Les valeurs présites sont faites sans effets aléatoires, ceux-ci sont ajoutés dans la fonction SaMARE avant de convertir le prédicteur linéaire en probabilité de mortalité.
+#'
 #' @export
 mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mort) {
   select <- dplyr::select
@@ -34,22 +23,44 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
 
     # Liste des effets
     listeEss <- c(
-      rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n), rep("ERS", n),
-      rep("FEN", n), rep("FIN", n), rep("HEG", n), rep("RES", n), rep("SAB", n)
+      rep("AUT", n),
+      rep("BOJ", n),
+      rep("EPX", n),
+      rep("ERR", n),
+      rep("ERS", n),
+      rep("FEN", n),
+      rep("FIN", n),
+      rep("HEG", n),
+      rep("RES", n),
+      rep("SAB", n)
     )
     listeVigu0 <- c(rep("NONVIG", n), rep("ViG", n))
     listeProd0 <- c(rep("pate", n), rep("resineux", n), rep("sciage", n))
     listeNtrt <- c(rep(2, n), rep(1, n), rep(0, n))
     listeTypePe <- c(rep("type0", n), rep("type1", n), rep("type2", n))
     listeEssInter2 <- c(
-      rep("AUT", n * 2), rep("BOJ", n * 2), rep("EPX", n * 2), rep("ERR", n * 2),
-      rep("ERS", n * 2), rep("FEN", n * 2), rep("FIN", n * 2), rep("HEG", n * 2),
-      rep("RES", n * 2), rep("SAB", n * 2)
+      rep("AUT", n * 2),
+      rep("BOJ", n * 2),
+      rep("EPX", n * 2),
+      rep("ERR", n * 2),
+      rep("ERS", n * 2),
+      rep("FEN", n * 2),
+      rep("FIN", n * 2),
+      rep("HEG", n * 2),
+      rep("RES", n * 2),
+      rep("SAB", n * 2)
     )
     listeEssInter3 <- c(
-      rep("AUT", n * 3), rep("BOJ", n * 3), rep("EPX", n * 3), rep("ERR", n * 3),
-      rep("ERS", n * 3), rep("FEN", n * 3), rep("FIN", n * 3), rep("HEG", n * 3),
-      rep("RES", n * 3), rep("SAB", n * 3)
+      rep("AUT", n * 3),
+      rep("BOJ", n * 3),
+      rep("EPX", n * 3),
+      rep("ERR", n * 3),
+      rep("ERS", n * 3),
+      rep("FEN", n * 3),
+      rep("FIN", n * 3),
+      rep("HEG", n * 3),
+      rep("RES", n * 3),
+      rep("SAB", n * 3)
     )
 
     # Construction de la matrice X
@@ -87,6 +98,7 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
       lazy_dt() %>%
       filter(GrEspece == "HEG") %>%
       as.data.frame()
+
     MortHEG <- MortHEG %>%
       lazy_dt() %>%
       mutate(cloglog = -5.4430 + 0.0621 * DHPcm + log(t)) %>%
@@ -102,22 +114,44 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
 
     # Liste des effets
     listeEss <- c(
-      rep("AUT", n), rep("BOJ", n), rep("EPX", n), rep("ERR", n), rep("ERS", n),
-      rep("FEN", n), rep("FIN", n), rep("HEG", n), rep("RES", n), rep("SAB", n)
+      rep("AUT", n),
+      rep("BOJ", n),
+      rep("EPX", n),
+      rep("ERR", n),
+      rep("ERS", n),
+      rep("FEN", n),
+      rep("FIN", n),
+      rep("HEG", n),
+      rep("RES", n),
+      rep("SAB", n)
     )
     listeVigu0 <- c(rep("NONVIG", n), rep("ViG", n))
     listeProd0 <- c(rep("pate", n), rep("resineux", n), rep("sciage", n))
     listeNtrt <- c(rep(2, n), rep(1, n), rep(0, n))
     listeTypePe <- c(rep("type0", n), rep("type1", n), rep("type2", n))
     listeEssInter2 <- c(
-      rep("AUT", n * 2), rep("BOJ", n * 2), rep("EPX", n * 2), rep("ERR", n * 2),
-      rep("ERS", n * 2), rep("FEN", n * 2), rep("FIN", n * 2), rep("HEG", n * 2),
-      rep("RES", n * 2), rep("SAB", n * 2)
+      rep("AUT", n * 2),
+      rep("BOJ", n * 2),
+      rep("EPX", n * 2),
+      rep("ERR", n * 2),
+      rep("ERS", n * 2),
+      rep("FEN", n * 2),
+      rep("FIN", n * 2),
+      rep("HEG", n * 2),
+      rep("RES", n * 2),
+      rep("SAB", n * 2)
     )
     listeEssInter3 <- c(
-      rep("AUT", n * 3), rep("BOJ", n * 3), rep("EPX", n * 3), rep("ERR", n * 3),
-      rep("ERS", n * 3), rep("FEN", n * 3), rep("FIN", n * 3), rep("HEG", n * 3),
-      rep("RES", n * 3), rep("SAB", n * 3)
+      rep("AUT", n * 3),
+      rep("BOJ", n * 3),
+      rep("EPX", n * 3),
+      rep("ERR", n * 3),
+      rep("ERS", n * 3),
+      rep("FEN", n * 3),
+      rep("FIN", n * 3),
+      rep("HEG", n * 3),
+      rep("RES", n * 3),
+      rep("SAB", n * 3)
     )
 
     # Construction de la matrice X
@@ -149,7 +183,9 @@ mort <- function(Mort, trt, temp, type_pe_Plac, fact_red, t, Iterj, MCH, Para.mo
     Mort$cloglog <- (Xmort %*% BetaMat)
 
     MortTot <- Mort %>%
+      lazy_dt() %>%
       select(ArbreID, cloglog) %>%
+      as.data.frame() %>%
       rbind(MortHEG)
 
     Mort <- MortBck %>%

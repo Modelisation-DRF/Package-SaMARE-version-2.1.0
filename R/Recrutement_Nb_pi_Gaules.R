@@ -1,24 +1,16 @@
-#' Fonction qui prévoie la probabilité d'absence  de recrues par grouoe d'espèce.
-#' Cette fonction corespond à la première portion de la fonction zero-inflated
-#' de prévision du nombre de recrues basé sur les gaules de Rijal et al. 2023.
+#' Prévoie la probabilité d'absence  de recrues par grouoe d'espèce.
+#' Cette fonction corespond à la première portion de la fonction zero-inflated de prévision du nombre de recrues basé sur les gaules de Rijal et al. 2023.
 #'
-#'
-#' @param RecGaules Dataframe qui contient les information sur la distribution
-#'                  des gaules dans la placette.
+#' @param RecGaules Dataframe qui contient les information sur la distribution des gaules dans la placette.
 #' @param t La longueur du pas de simulation en annees (en annees).
-#' @param Rec  Un dataframe qui contient la prévision du nombre de recrues par
-#'             groupes d'espèces.
+#' @param Rec  Un dataframe qui contient la prévision du nombre de recrues par groupes d'espèces.
 #' @param Iterj  Itération en cours.
-#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à
-#'                          l'échelle de la placette du module de
-#'                          recrutement basé sur les gaules et du module
-#'                          d'évolution des gaules.
-#' @param st_tot0  Surface terrière marchande (DHP >9.0cm) de la placette
-#'                 au début du pas de simulation.
-#' @param Para.rec_gaules Paramètres de l'équation de prévivion du nombre de
-#'                        recrues utilisant le nombre de gaules.
-#' @return  Retourne une prévision de la probabilité d'absence de recrues,
-#'           prévisions basées sur les informations provenant des recrues.
+#' @param RandomPlacGaules  Un dataframe contenant les effets aléatoires à l'échelle de la placette du module de recrutement basé sur les gaules et du module d'évolution des gaules.
+#' @param st_tot0  Surface terrière marchande (DHP >9.0cm) de la placette au début du pas de simulation.
+#' @param Para.rec_gaules Paramètres de l'équation de prévivion du nombre de recrues utilisant le nombre de gaules.
+#'
+#' @return  Une prévision de la probabilité d'absence de recrues, prévisions basées sur les informations provenant des recrues.
+#'
 #' @export
 rec_pi_Gaules <- function(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules, Para.rec_gaules) {
   select <- dplyr::select
@@ -26,8 +18,13 @@ rec_pi_Gaules <- function(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules, P
 
   # Liste des effets
   listeGrEss1 <- c(
-    rep("AUT", n), rep("EPX", n), rep("ERR", n), rep("FEN", n),
-    rep("FIN", n), rep("HEG", n), rep("RES", n)
+    rep("AUT", n),
+    rep("EPX", n),
+    rep("ERR", n),
+    rep("FEN", n),
+    rep("FIN", n),
+    rep("HEG", n),
+    rep("RES", n)
   )
 
   listeGrEss2 <- c(rep("ERS", n), rep("HEG", n), rep("BOJ", n), rep("SAB", n))
@@ -41,10 +38,10 @@ rec_pi_Gaules <- function(Rec, RecGaules, t, st_tot0, Iterj, RandomPlacGaules, P
   Xrec_pi[, 11:14] <- (RecGaules$GrEspece == listeGrEss2) * RecGaules$lnNb_Gaules_68_Ess_Ha
 
   # selectionner les parametres d'accroissement de la vp et du groupe d'essences de l'arbre
-  ParaRec_pi <- as.data.frame(
-    lazy_dt(Para.rec_gaules) %>%
-      filter(Iter == Iterj & response == "pi")
-  )
+  ParaRec_pi <- Para.rec_gaules %>%
+    lazy_dt() %>%
+    filter(Iter == Iterj & response == "pi") %>%
+    as.data.frame()
 
   # Construction matrice beta
   BetaMat <- matrix(ParaRec_pi$ParameterEstimate, ncol = 1)

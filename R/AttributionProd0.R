@@ -1,7 +1,4 @@
-#' Fonction qui attribut les produits au début de la simulation. La fonction
-#' cherche dabord si la tige est résineuse ensuite si le classement
-#' vigueur 1,2,3,4,5,6 est fourni sinon elle cherche le classement MSCR pour
-#' attribuer le produit sinon il classe l'arbre comme pate.
+#' Attribut les produits au début de la simulation. La fonction cherche dabord si la tige est résineuse ensuite si le classement vigueur 1,2,3,4,5,6 est fourni sinon elle cherche le classement MSCR pour attribuer le produit sinon il classe l'arbre comme pate.
 #'
 #' @param Data Un dataframe contenant une ligne par arbre pour lesquels on
 #'              veut attribuer le vigueur.
@@ -12,8 +9,6 @@
 #' @return Retourne la classe de produit de l'arbre.
 #'
 #' @export
-#'
-
 AttribProd0 <- function(Data, Para.ConvMSCRProd1024, Para.ConvMSCRProd24) {
   select <- dplyr::select
 

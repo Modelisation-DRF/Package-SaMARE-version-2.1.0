@@ -1,32 +1,13 @@
-#' Fonction qui sert à appeler le simulateur SaMARE et qui fournit les données
-#' initiales ainsi qu'un choix de paramètres pour la simulation.
+#' Appele le simulateur SaMARE et fournit les données initiales ainsi qu'un choix de paramètres pour la simulation.
 #'
 #' @param NbIter Valeur numérique du nombre d'iterations à effectuer (ex: 30).
-#' @param Horizon Valeur numérique du nombre de périodes de 5 ans sur lesquelles
-#'                le simulateur effectuera ses simulations (ex: 6 pour 30 ans de simulation).
-#' @param RecruesGaules Variable prenant la valeur de "1" pour utiliser les
-#'                       paramètres de recrutement basé sur l'inventaire des gaules
-#'                       de la placette et de "0" pour utiliser le module de
-#'                       recrutement basé sur les arbres de dimension marchande.
-#' @param Data Un dataframe contenant les valeurs de départ pour une liste
-#'             d'arbres à simuler. Les champs: "Placette","NoArbre","Espece",
-#'             "Etat","DHPcm","Vigueur","Nombre","Sup_PE","Annee_Coupe",
-#'             "Latitude","Longitude","Altitude","Pente","Ptot","Tmoy","GrwDays",
-#'             "Reg_Eco","Type_Eco", "MSCR","ntrt" doivent être présents. Si l'information
-#'             sur certains champs n'est pas disponible, on peut le laisser vide.
-#' @param Gaules Un dataframe contenant les valeurs de départ du nombre de gaules
-#'                par espèce et par classe de diamètre. Cette information doit être
-#'                fournie si le paramètre "RecruesGaules=1.
-#'                Les champs: "Placette","Espece","DHPcm",#' "Nombre","Sup_PE"
-#'                doivent être présents.
-#' @param MCH Variable prenant la valeur de 1 en présence de maladie corticale du hêtre dans
-#'            la placette et 0 lorsque la maladie est absente. Lorsque la maladie corticale
-#'            est présente,la probabilité de mortalié des hêtres est estimée avec
-#'            l'équation de l'avis technique AT-SSRF 20 de la Direction de la recherche forestière.
+#' @param Horizon Valeur numérique du nombre de périodes de 5 ans sur lesquelles le simulateur effectuera ses simulations (ex: 6 pour 30 ans de simulation).
+#' @param RecruesGaules Variable prenant la valeur de "1" pour utiliser les paramètres de recrutement basé sur l'inventaire des gaules de la placette et de "0" pour utiliser le module de recrutement basé sur les arbres de dimension marchande.
+#' @param Data Un dataframe contenant les valeurs de départ pour une liste d'arbres à simuler. Les champs: "Placette","NoArbre","Espece", "Etat","DHPcm","Vigueur","Nombre","Sup_PE","Annee_Coupe", "Latitude","Longitude","Altitude","Pente","Ptot","Tmoy","GrwDays", "Reg_Eco","Type_Eco", "MSCR","ntrt" doivent être présents. Si l'information sur certains champs n'est pas disponible, on peut le laisser vide.
+#' @param Gaules Un dataframe contenant les valeurs de départ du nombre de gaules par espèce et par classe de diamètre. Cette information doit être fournie si le paramètre "RecruesGaules=1. Les champs: "Placette","Espece","DHPcm",#' "Nombre","Sup_PE" doivent être présents.
+#' @param MCH Variable prenant la valeur de 1 en présence de maladie corticale du hêtre dans la placette et 0 lorsque la maladie est absente. Lorsque la maladie corticale est présente,la probabilité de mortalié des hêtres est estimée avec l'équation de l'avis technique AT-SSRF 20 de la Direction de la recherche forestière.
 #'
-#' @return Retourne un dataframe contenant la liste des arbres, leur état, leur DHP,
-#'         leur hauteur et leur volume pour chaque placette, chaque pas de simulation
-#'         et chaque iteration.
+#' @return Un dataframe contenant la liste des arbres, leur état, leur DHP, leur hauteur et leur volume pour chaque placette, chaque pas de simulation et chaque iteration.
 #'
 #' @examples
 #' \dontrun{
@@ -39,22 +20,24 @@
 #' )
 #' }
 #' @export
-
-SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
+SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, coreNumbers = 1) {
   select <- dplyr::select
 
   ################################ Lecture des fichiers de placette et de parametres ###################
   Data <- renommer_les_colonnes(Data)
+
   Gaules <- if (!missing(Gaules)) renommer_les_colonnes_gaules(Gaules) else NA
   Data <- Data %>%
     lazy_dt() %>%
     filter(DHPcm >= 9) %>%
     as.data.frame()
-  Data <- valide_Annee_depart(Data)
+
+  AnneeDep <- as.numeric(format(Sys.Date(), "%Y"))
 
   # Fichier des effets aleatoires
   CovParms <- MatchModuleCovparms
   EfCovParms <- EffetCovParms
+
   CovParmsGaules <- CovparmGaules
 
   ####### Fichier des parametres
@@ -98,7 +81,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
   ColOrdre <- c(
     "Placette", "NoArbre", "Espece", "GrEspece", "Etat", "DHPcm", "Vigueur", "Nombre",
     "Sup_PE", "Annee_Coupe", "Latitude", "Longitude", "Altitude", "Pente", "Ptot", "Tmoy",
-    "GrwDays", "Reg_Eco", "Type_Eco", "MSCR", "ntrt", "ABCD", "Annee_Inventaire"
+    "GrwDays", "Reg_Eco", "Type_Eco", "MSCR", "ntrt", "ABCD"
   )
 
   Data <- Data %>%
@@ -167,31 +150,36 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
   registerDoFuture()
   plan(multisession)
 
-  list_plot <- unique(ListeIter$PlacetteID) # liste de placette/iter, donc on parallélise les placettes/iter
-  list_annedep <- sub("(_[0-9]+)$", "", list_plot)
+  # liste de placette/iter, donc on parallélise les placettes/iter
+  list_plot <- unique(ListeIter$PlacetteID)
 
-  Simul <- bind_rows(
-    ###### utilisation de doRNG permet de controler la seed
-    foreach(x = list_plot, y = list_annedep) %dorng% {
-      SaMARE(
-        Random = RandPlacStep,
-        RandomGaules = RandPlacStepGaules,
-        Data = Data,
-        Gaules = Gaules,
-        ListeIter = ListeIter[ListeIter$PlacetteID == x, ],
-        Annee_Inventaire = unique(Data$Annee_Inventaire[Data$Placette == y]),
-        Horizon = Horizon,
-        RecruesGaules = RecruesGaules,
-        MCH = MCH,
-        CovParms = CovParms,
-        CovParmsGaules = CovParmsGaules,
-        Para = Para,
-        ParaGaules = ParaGaules,
-        Omega = Omega,
-        OmegaGaules = OmegaGaules
-      )
-    }
-  )
+  cluster1 <- makeCluster(coreNumbers)
+  registerDoParallel(cluster1)
+
+  ###### utilisation de doRNG permet de controler la seed
+  clusterResult <- foreach(x = list_plot) %dorng% {
+    SaMARE(
+      Random = RandPlacStep,
+      RandomGaules = RandPlacStepGaules,
+      Data = Data,
+      Gaules = Gaules,
+      ListeIter = ListeIter[ListeIter$PlacetteID == x, ],
+      Annee_Inventaire = AnneeDep,
+      Horizon = Horizon,
+      RecruesGaules = RecruesGaules,
+      MCH = MCH,
+      CovParms = CovParms,
+      CovParmsGaules = CovParmsGaules,
+      Para = Para,
+      ParaGaules = ParaGaules,
+      Omega = Omega,
+      OmegaGaules = OmegaGaules
+    )
+  }
+
+  Simul <- bind_rows(clusterResult)
+
+  stopCluster(cluster1)
 
   plan(sequential)
 
@@ -209,19 +197,13 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
   Simul <- Simul %>%
     lazy_dt() %>%
     inner_join(VarEco, relationship = "many-to-many", by = "Placette") %>%
-    mutate(nb_tige = Nombre / Sup_PE / 25) %>% # Conversion pour relation HD
-    group_by(Placette) %>%
-    mutate(step = (Annee - min(Annee)) / 5 + 1) %>%
-    ungroup() %>%
+    mutate(nb_tige = Nombre / Sup_PE / 25, step = (Annee - AnneeDep) / 5 + 1) %>% # Conversion pour relation HD
     rename(
       id_pe = Placette, dhpcm = DHPcm, no_arbre = ArbreID, # IA: j'ai enlevé essence=GrEspece
       altitude = Altitude, p_tot = Ptot, t_ma = Tmoy, iter = Iter
     ) %>%
     as.data.frame()
 
-  # IA: ajout
-  # faire l'association d'essence pour l'équation de hauteur et de volume: le data ass_ess_ht_vol est un fihcier rda sous data\
-  # utiliser GrEspece pour faire l'association
   ass_ess_ht_vol2 <- ass_ess_ht_vol %>%
     lazy_dt() %>%
     group_by(GrEspece) %>%
@@ -230,6 +212,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
     as.data.frame()
 
   Simul <- left_join(Simul, ass_ess_ht_vol2, by = "GrEspece")
+
   SimulHtVol1 <- Simul[which(Simul$Residuel == 0), ]
   nb_iter <- length(unique(SimulHtVol1$iter))
   nb_periodes <- Horizon + 1
@@ -237,68 +220,21 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
   SimulHtVol1 <- SimulHtVol1 %>%
     lazy_dt() %>%
     rename(essence = essence_hauteur) %>%
-    as.data.frame() # IA: ajout
-
-  SimulHtVol1$milieu <- as.character(SimulHtVol1$milieu)
-
-  taille_lot <- 5e6
-  n <- nrow(SimulHtVol1)
-  nb_lots <- ceiling(n / taille_lot)
-
-  resultats <- vector("list", nb_lots)
-
-  for (i in seq_len(nb_lots)) {
-    debut <- (i - 1) * taille_lot + 1
-    fin <- min(i * taille_lot, n)
-    lot <- SimulHtVol1[debut:fin, ]
-    resultats[[i]] <- TarifQC::relation_h_d(fic_arbres = lot, mode_simul = "STO", nb_iter = nb_iter, nb_step = nb_periodes, reg_eco = TRUE, dt = 5)
-  }
-
-  resultats <- do.call(rbind, resultats)
-  rm(SimulHtVol1)
-
-  resultats <- resultats %>%
-    lazy_dt() %>%
-    dplyr::select(-essence) %>%
     as.data.frame()
-  SimulHtVol1 <- resultats %>%
+
+  ht <- ht %>%
     lazy_dt() %>%
     rename(essence = essence_volume) %>%
     as.data.frame()
-  rm(resultats)
-  rm(taille_lot)
-  rm(n)
-  rm(nb_lots)
-  rm(lot)
-
-  taille_lot <- 3e6
-  n <- nrow(SimulHtVol1)
-  nb_lots <- ceiling(n / taille_lot)
-
-  resultats <- vector("list", nb_lots)
-
-  for (i in seq_len(nb_lots)) {
-    debut <- (i - 1) * taille_lot + 1
-    fin <- min(i * taille_lot, n)
-    lot <- SimulHtVol1[debut:fin, ]
-    resultats[[i]] <- TarifQC::cubage(fic_arbres = lot, mode_simul = "STO", nb_iter = nb_iter, nb_step = nb_periodes)
-  }
-
-  resultats <- do.call(rbind, resultats)
-
-  resultats <- resultats %>%
+  SimulHtVol2 <- TarifQC::cubage(fic_arbres = ht, mode_simul = "STO", nb_iter = nb_iter, nb_step = nb_periodes) %>%
     lazy_dt() %>%
     dplyr::select(-essence) %>%
-    as.data.frame() # IA: ajout
+    as.data.frame()
 
   rm(SimulHtVol1)
-  rm(taille_lot)
-  rm(n)
-  rm(nb_lots)
-  rm(lot)
-
-  SimulHtVol2 <- resultats[, c("id_pe", "Annee", "iter", "no_arbre", "hauteur_pred", "vol_dm3")] ### Garde juste les variables de hauteur et volume pour
-  ### joindre avec Simul pour garder les morts
+  # Garde juste les variables de hauteur et volume pour
+  SimulHtVol2 <- SimulHtVol2[, c("id_pe", "Annee", "iter", "no_arbre", "hauteur_pred", "vol_dm3")]
+  # joindre avec Simul pour garder les morts
 
   SimulHtVol <- Simul %>%
     lazy_dt() %>%
@@ -308,7 +244,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0) {
       Altitude = altitude, Ptot = p_tot, Tmoy = t_ma, Iter = iter
     ) %>%
     mutate(PlacetteID = paste(Placette, "_", Iter, sep = "")) %>%
-    mutate(vol_dm3 = ifelse(Espece %in% c("AME", "AUR", "ERE", "ERG", "ERP", "MAS", "PRP", "SAL", "SOA", "SOD"), NA, vol_dm3)) %>%
+    # enlever les variables qui étaient nécessaire seulement pour tarifqc
     dplyr::select(-milieu, -veg_pot, -essence_hauteur, -essence_volume, -step, -nb_tige) %>%
     as.data.frame()
 

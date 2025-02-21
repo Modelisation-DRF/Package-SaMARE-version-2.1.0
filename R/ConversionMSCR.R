@@ -1,11 +1,9 @@
-#' Fonction qui permet de convertir le classement MSCR Boulet-2007 en vigueur
-#' selon le classement de Majcen-1990.
-#' @param Data Un dataframe contenant une ligne par arbre avec un champ MSCR
-#'             copntenant le classement MSCR de l'arbre. Les classements acceptés
-#'             sont M, S, C, MS ou CR.
-#' @param Para.ConvMSCRVig Un dataframe  contenant les paramettres des équations
-#'                         de conversion du classement MSCR en vigueur.
-#' @return Retourne un vecteur de probabilité que l'arbre soit vigoureux.
+#' Converti le classement MSCR Boulet-2007 en vigueur selon le classement de Majcen-1990.
+#'
+#' @param Data Un dataframe contenant une ligne par arbre avec un champ MSCR copntenant le classement MSCR de l'arbre. Les classements acceptés sont M, S, C, MS ou CR.
+#' @param Para.ConvMSCRVig Un dataframe  contenant les paramettres des équations de conversion du classement MSCR en vigueur.
+#'
+#' @return Un vecteur de probabilité que l'arbre soit vigoureux.
 #'
 #' @export
 ConvMSCRVig <- function(Data, Para.ConvMSCRVig) {
@@ -18,8 +16,14 @@ ConvMSCRVig <- function(Data, Para.ConvMSCRVig) {
 
   listeMSCR <- c(rep("R", n), rep("C", n), rep("S", n), rep("M", n), rep("CR", n), rep("MS", n))
   listeEss <- c(
-    rep("BOJ", n), rep("ERR", n), rep("ERS", n), rep("FEN", n), rep("FIN", n),
-    rep("HEG", n), rep("RES", n), rep("SAB", n)
+    rep("BOJ", n),
+    rep("ERR", n),
+    rep("ERS", n),
+    rep("FEN", n),
+    rep("FIN", n),
+    rep("HEG", n),
+    rep("RES", n),
+    rep("SAB", n)
   )
 
   # Construction matrice X
@@ -38,18 +42,18 @@ ConvMSCRVig <- function(Data, Para.ConvMSCRVig) {
   # Calcul
   logit <- as.vector(XConvMSCRVig %*% BetaMat)
 
-
   pred <- exp(logit) / (1 + exp(logit))
 
   return(pred)
 }
 
-#' Fonction qui permet de convertir le classement MSCR Boulet-2007 en produits pour les arbres feuillus de
-#' 9,1 à 23,0 cm de diamètre selon le classement de Majcen-1990
-#' @param Data Un dataframe contenant une ligne par arbre avec un champ MSCR copntenant le classement
-#'             MSCR de l'arbre. Les classements acceptés sont M, S, C, MS ou CR
+#' Converti le classement MSCR Boulet-2007 en produits pour les arbres feuillus de 9,1 à 23,0 cm de diamètre selon le classement de Majcen-1990
+#'
+#' @param Data Un dataframe contenant une ligne par arbre avec un champ MSCR copntenant le classement MSCR de l'arbre. Les classements acceptés sont M, S, C, MS ou CR
 #' @param Para.ConvMSCRProd1024 Un dataframe  contenant les paramettres des équations de conversion du classement MSCR en vigueur
-#' @return Retourne un vecteur de probabilité que l'arbre soit de classe de produit sciage
+#'
+#' @return Un vecteur de probabilité que l'arbre soit de classe de produit sciage
+#'
 #' @export
 ConvMSCRProd1024 <- function(Data, Para.ConvMSCRProd1024) {
   n <- nrow(Data)
@@ -105,12 +109,13 @@ ConvMSCRProd1024 <- function(Data, Para.ConvMSCRProd1024) {
   return(pred)
 }
 
-#' Fonction qui permet de convertir le classement MSCR Boulet-2007 en produits pour les arbres feuillus de
-#' plus de 23,0 cm de diamètre selon le classement de Majcen-1990
-#' @param Data Un dataframe contenant une ligne par arbre avec un champ MSCR copntenant le classement
-#'             MSCR de l'arbre. Les classements acceptés sont M, S, C, MS ou CR
+#' Converti le classement MSCR Boulet-2007 en produits pour les arbres feuillus de plus de 23,0 cm de diamètre selon le classement de Majcen-1990
+#'
+#' @param Data Un dataframe contenant une ligne par arbre avec un champ MSCR copntenant le classement MSCR de l'arbre. Les classements acceptés sont M, S, C, MS ou CR
 #' @param Para.ConvMSCRProd24 Un dataframe  contenant les paramettres des équations de conversion du classement MSCR en vigueur
-#' @return Retourne un vecteur de probabilité que l'arbre soit de classe de produit sciage
+#'
+#' @return Un vecteur de probabilité que l'arbre soit de classe de produit sciage
+#'
 #' @export
 ConvMSCRProd24 <- function(Data, Para.ConvMSCRProd24) {
   n <- nrow(Data)
@@ -145,7 +150,6 @@ ConvMSCRProd24 <- function(Data, Para.ConvMSCRProd24) {
 
   # Calcul
   logit <- as.vector(XConvMSCRProd24 %*% BetaMat)
-
 
   pred <- exp(logit) / (1 + exp(logit))
 

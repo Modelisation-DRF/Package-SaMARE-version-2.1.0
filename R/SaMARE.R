@@ -1,50 +1,23 @@
-#' Fonction qui effectue la simulation de l'évolution des arbres d'une placette
-#' du simulateur SaMARE. Cette fonction effectue la simulation et
-#' appele chacune des fonction permettant de prévoir la mortalité, l'accroissement,
-#' le recrutement et l'évolution des paramètres de simulation.
+#' Effectue la simulation de l'évolution des arbres d'une placette du simulateur SaMARE. Cette fonction effectue la simulation et appele chacune des fonction permettant de prévoir la mortalité, l'accroissement, le recrutement et l'évolution des paramètres de simulation.
 #'
-#'
-#' @param Random Un dataframe contenant des effets aléatoires à l'échelle de
-#'               la placette et de la période de simulation pour les modules
-#'               de SaMARE qui n'utilisent pas les gaules.
-#' @param RandomGaules  Un dataframe contenant des effets aléatoires à l'échelle de
-#'                      la placette et de la période de simulation pour les modules
-#'                      de SaMARE qui utilisent les gaules.
-#' @param Data    Un dataframe contenant une liste des arbres de dimenssion marchande
-#'                d'une placette à simuler ainsi que des variables nécessaire à
-#'                la simulation.
-#' @param Gaules  Un dataframe contenant la distribution du nombre de gaules par
-#'                classe de diamètre et par groupe d'essence d'une placette à
-#'                simuler ainsi que des variables nécessaire à la simulation.
-#' @param ListeIter Un dataframe contenant le numéro de la placette à simuler
-#'                  et le numéro de l'iteration à effecuer.
-#' @param Annee_Inventaire Année de départ de la simulation.
+#' @param Random Un dataframe contenant des effets aléatoires à l'échelle de la placette et de la période de simulation pour les modules de SaMARE qui n'utilisent pas les gaules.
+#' @param RandomGaules Un dataframe contenant des effets aléatoires à l'échelle de la placette et de la période de simulation pour les modules de SaMARE qui utilisent les gaules.
+#' @param Data Un dataframe contenant une liste des arbres de dimenssion marchande d'une placette à simuler ainsi que des variables nécessaire à la simulation.
+#' @param Gaules Un dataframe contenant la distribution du nombre de gaules par classe de diamètre et par groupe d'essence d'une placette à simuler ainsi que des variables nécessaire à la simulation.
+#' @param ListeIter Un dataframe contenant le numéro de la placette à simuler et le numéro de l'iteration à effecuer.
+#' @param AnneeDep Année de départ de la simulation.
 #' @param Horizon Nombre de pas de 5 ans de simulation à effectuer.
-#' @param RecruesGaules  Variable prenant la valeur de "1" pour utiliser les
-#'                       paramètres de recrutement basé sur l'inventaire des gaules
-#'                       de la placette et de "0" pour utiliser le module de
-#'                       recrutement basé sur les arbres de dimension marchande.
-#' @param MCH Variable prenant la veleur de 1 en présence de maladie corticale du hêtre dans
-#'            la placette et 0 lorsque la maladie est absente. Lorsque la maladie corticale
-#'            est présente,la probabilité de mortalié des hêtres est estimée avec
-#'            l'équation de l'avis technique AT-SSRF 20 de la Direction de la recherche forestière.
-#' @param CovParms Un dataframe contenant la variance des effets aléatoires des
-#'                  équations des modules de base de SaMARE (modules 1 à 9 et 17 à 19).
-#' @param CovParmsGaules Un dataframe contenant la variance des effets aléatoires des
-#'                        équations des modules de SaMARE basés sur l'information
-#'                        provenant des gaules (modules 10 à 16).
-#' @param Para  Un dataframe contenant les paramètres des modules de 1 à 9 et 17 à 19
-#'               (modules de base) de SaMARE.
-#' @param ParaGaules Un dataframe contenant les paramètres des modules 17à 19
-#'               (modules basés sur les gaules) de SaMARE.
-#' @param Omega Un dataframe contenant pour chaque module de base de SaMARE
-#'              (modules 1 à 9 17 à 19) le éléments du triangle inférieur de
-#'               la matrice de variance-covariance.
-#' @param OmegaGaules Un dataframe contenant pour chaque module basé sur les gaules
-#'                    de SaMARE (modules 10 à 16) les éléments du triangle inférieur de
-#'                    la matrice de variance-covariance.
-#' @return Retourne un dataframe avec une liste d'arbres vivants et mort ainsi que
-#'        leur DHP pour chaque étape de 5 ans de l'horizon de simulation.
+#' @param RecruesGaules Variable prenant la valeur de "1" pour utiliser les paramètres de recrutement basé sur l'inventaire des gaules de la placette et de "0" pour utiliser le module de recrutement basé sur les arbres de dimension marchande.
+#' @param MCH Variable prenant la veleur de 1 en présence de maladie corticale du hêtre dans la placette et 0 lorsque la maladie est absente. Lorsque la maladie corticale est présente,la probabilité de mortalié des hêtres est estimée avec l'équation de l'avis technique AT-SSRF 20 de la Direction de la recherche forestière.
+#' @param CovParms Un dataframe contenant la variance des effets aléatoires des équations des modules de base de SaMARE (modules 1 à 9 et 17 à 19).
+#' @param CovParmsGaules Un dataframe contenant la variance des effets aléatoires des équations des modules de SaMARE basés sur l'information provenant des gaules (modules 10 à 16).
+#' @param Para Un dataframe contenant les paramètres des modules de 1 à 9 et 17 à 19 (modules de base) de SaMARE.
+#' @param ParaGaules Un dataframe contenant les paramètres des modules 17à 19 (modules basés sur les gaules) de SaMARE.
+#' @param Omega Un dataframe contenant pour chaque module de base de SaMARE (modules 1 à 9 17 à 19) le éléments du triangle inférieur de la matrice de variance-covariance.
+#' @param OmegaGaules Un dataframe contenant pour chaque module basé sur les gaules de SaMARE (modules 10 à 16) les éléments du triangle inférieur de la matrice de variance-covariance.
+#'
+#' @return Un dataframe avec une liste d'arbres vivants et mort ainsi que leur DHP pour chaque étape de 5 ans de l'horizon de simulation.
+#'
 #' @export
 
 SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventaire, Horizon, RecruesGaules,
@@ -160,7 +133,7 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventai
   Plac <- PlacOri %>%
     lazy_dt() %>%
     filter(Etat %in% c(10, 11, 12, 40, 42, 30, 32, 50, 52, 70, 71, 72)) %>%
-    mutate(Etat = ifelse(Etat %in% c(11, 71, 72), "martele", "vivant"), ArbreID = seq(1:n())) %>%
+    mutate(Etat = ifelse(Etat == 11, "martele", "vivant"), ArbreID = seq(1:n())) %>%
     select(
       Placette, Annee, ArbreID, NoArbre, GrEspece, Espece, Etat,
       DHPcm, Nombre, Vigueur, Iter, MSCR, ABCD
@@ -240,8 +213,18 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventai
       as.data.frame()
 
     Para.EvolQual <- list(
-      Para.EvolQualBOJ1, Para.EvolQualBOJ2, Para.EvolQualBOJ3, Para.EvolQualERR1, Para.EvolQualERR2, Para.EvolQualERS1,
-      Para.EvolQualERS2, Para.EvolQualERS3, Para.EvolQualFEN1, Para.EvolQualFEN2, Para.EvolQualHEG1, Para.EvolQualHEG2,
+      Para.EvolQualBOJ1,
+      Para.EvolQualBOJ2,
+      Para.EvolQualBOJ3,
+      Para.EvolQualERR1,
+      Para.EvolQualERR2,
+      Para.EvolQualERS1,
+      Para.EvolQualERS2,
+      Para.EvolQualERS3,
+      Para.EvolQualFEN1,
+      Para.EvolQualFEN2,
+      Para.EvolQualHEG1,
+      Para.EvolQualHEG2,
       Para.EvolQualHEG3
     )
     Para.EvolQualTot <- c()
@@ -253,9 +236,30 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventai
     }
 
     rm(
-      ParaBOJ, ParaERR, ParaERS, ParaFEN, ParaHEG, OmegaBOJ, OmegaERR, OmegaERS, OmegaFEN, OmegaHEG, Para.EvolQualBOJ1, Para.EvolQualBOJ2,
-      Para.EvolQualBOJ3, Para.EvolQualERR1, Para.EvolQualERR2, Para.EvolQualERS1, Para.EvolQualERS2, Para.EvolQualERS3, Para.EvolQualFEN1,
-      Para.EvolQualFEN2, Para.EvolQualHEG1, Para.EvolQualHEG2, Para.EvolQualHEG3, Para.EvolQual
+      ParaBOJ,
+      ParaERR,
+      ParaERS,
+      ParaFEN,
+      ParaHEG,
+      OmegaBOJ,
+      OmegaERR,
+      OmegaERS,
+      OmegaFEN,
+      OmegaHEG,
+      Para.EvolQualBOJ1,
+      Para.EvolQualBOJ2,
+      Para.EvolQualBOJ3,
+      Para.EvolQualERR1,
+      Para.EvolQualERR2,
+      Para.EvolQualERS1,
+      Para.EvolQualERS2,
+      Para.EvolQualERS3,
+      Para.EvolQualFEN1,
+      Para.EvolQualFEN2,
+      Para.EvolQualHEG1,
+      Para.EvolQualHEG2,
+      Para.EvolQualHEG3,
+      Para.EvolQual
     )
   }
 
@@ -305,14 +309,21 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventai
   latitude <- PlacOri$Latitude[1]
   longitude <- PlacOri$Longitude[1]
   altitude <- PlacOri$Altitude[1]
+
   pente <- ifelse(is.na(PlacOri$Pente[1] == TRUE), 6.5, PlacOri$Pente[1])
+
+  ## valeur de 4 attribué aux domaines pas dans la liste d'effets
   dom <- substr(PlacOri$Reg_Eco[1], 1, 1) %>% ifelse(!. %in% c("2", "3", "4"), "4", .)
+
   reg <- PlacOri$Reg_Eco[1]
+
   rid1 <- ifelse(reg %in% c("1a", "2a", "2b", "2c"), "2o", ifelse(reg %in% c("4a", "4b", "4c"), "4o",
     ifelse(reg %in% c("4d", "4e", "4f", "4g", "4h"), "4e", reg)
   )) %>%
+    # Ajouté DU et SV qui manquaient et mis "4o" quand manquant
     ifelse(!. %in% c("2o", "3a", "3b", "3c", "3d", "4e", "4o", "DU", "SV"), "4o", .)
   teco <- PlacOri$Type_Eco[1]
+
   vegp <- substr(PlacOri$Type_Eco[1], 1, 3)
 
   # Variables climatiques de la placette
@@ -354,6 +365,7 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventai
 
       ################## Atribution de vigueur et de produit##############
       ParaViglist <- list(Para.ConvMSCRVig)
+
       Vigu0 <- Plac %>%
         lazy_dt() %>%
         group_by(Placette, NoArbre) %>%
@@ -423,6 +435,7 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventai
       f <- function(i, j, var_res, gamma, rho) {
         (((i - j) != 0) * (var_res * gamma * rho^(abs(j - i) - 1))) + (((i - j) == 0) * var_res)
       } # correlation arma
+
       # créer et remplir la matrice de var-cov
       varcov <- expand.grid(i = 1:Horizon, j = 1:Horizon)
       varcov <- matrix(f(varcov$i, varcov$j, Residual, Gamma, Rho), nrow = Horizon)
@@ -714,21 +727,51 @@ SaMARE <- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventai
 
       ################## Mise à jour Nombre de gaules
       predNbGaules <- round(nb_Gaules(
-        Rec, RecGaules, t, st_tot0, altitude, latitude, trt, t0_aj_,
-        longitude, temp, pente, Iterj, RandomPlacGaules, Para.nb_gaules
+        Rec,
+        RecGaules,
+        t,
+        st_tot0,
+        altitude,
+        latitude,
+        trt,
+        t0_aj_,
+        longitude,
+        temp,
+        pente,
+        Iterj,
+        RandomPlacGaules,
+        Para.nb_gaules
       ))
 
       ################## Ratio Gaules
       Ratio <- data.frame("GrEspece" = c("AUT", "BOJ", "EPX", "ERR", "ERS", "FEN", "FIN", "HEG", "RES", "SAB"))
 
       Ratio$Pi <- ratio_pi_Gaules(
-        Ratio, Rec, RecGaules, t, st_tot0, latitude, longitude,
-        Iterj, RandomPlacGaules, Para.ratio_gaules
+        Ratio,
+        Rec,
+        RecGaules,
+        t,
+        st_tot0,
+        latitude,
+        longitude,
+        Iterj,
+        RandomPlacGaules,
+        Para.ratio_gaules
       )
 
       Ratio$Count <- ratio_count_Gaules(
-        Ratio, Rec, RecGaules, t, st_tot0, latitude, longitude,
-        prec, trt, t0_aj_, Iterj, RandomPlacGaules, Para.ratio_gaules
+        Ratio,
+        Rec,
+        RecGaules,
+        t, st_tot0,
+        latitude,
+        longitude,
+        prec,
+        trt,
+        t0_aj_,
+        Iterj,
+        RandomPlacGaules,
+        Para.ratio_gaules
       )
 
       Ratio <- Ratio %>%

@@ -1,114 +1,98 @@
 #' Fonction qui prépare les graphiques à insérer dans l'interface utilisateur
 #' cette function prend en parametre une sortie de la fonction SimulSaMARE
-
-#' @param SimulHtVol Un dataframe contenant les résultats de simulation pour chacune des
-#'                    iterations du simulateur SaMARE. Typiquement un résultat retourné
-#'                    par la fonction "SimulSaMARE".
-#' @param Espece Un code de trois lettre majuscule présentant l'espèce pour laquelle on veut faire
-#'              les graphiques. Le code d'espèce doit être celui d'un des groupes d'espèce de SaMARE
-#'              ou le code "TOT" pour l'ensemble des espèces.
-#' @param Variable  La variable pour laquelle le graphique d'évolution sera créé. Cette variable doit être une des
-#'          variable de la sortie "Dendro-SaMARE" soit "Vol_HA", "ST_HA", "DQM","HDomM" ou "nbTi_HA"
-#' @param listePlacette Vecteur contenant la liste des placettes à inclure dans le graphique
-#' @return  Retourne une liste de deux graphiques, le premier montrant l'évolution d'une variables
-#'          dendrométrique et le second la distribution en diamètre au début et à la fin de la simulation
-#'          moyen quadratique et la hauteur dominante.
-#' @export
 #'
+#' @param SimulHtVol Un dataframe contenant les résultats de simulation pour chacune des iterations du simulateur SaMARE. Typiquement un résultat retourné par la fonction "SimulSaMARE".
+#' @param Espece Un code de trois lettre majuscule présentant l'espèce pour laquelle on veut faire les graphiques. Le code d'espèce doit être celui d'un des groupes d'espèce de SaMARE ou le code "TOT" pour l'ensemble des espèces.
+#' @param Variable  La variable pour laquelle le graphique d'évolution sera créé. Cette variable doit être une des variable de la sortie "Dendro-SaMARE" soit "Vol_HA", "ST_HA", "DQM","HDomM" ou "nbTi_HA"
+#' @param listePlacette Vecteur contenant la liste des placettes à inclure dans le graphique
+#'
+#' @return  Une liste de deux graphiques, le premier montrant l'évolution d'une variables dendrométrique et le second la distribution en diamètre au début et à la fin de la simulation moyen quadratique et la hauteur dominante.
+#'
+#' @export
 Graph <- function(SimulHtVol, Espece = "TOT", Variable = "ST_HA", listePlacette) {
-  Data <- as.data.frame(
-    lazy_dt(SortieDendroSamare(SimulHtVol)) %>%
-      filter(GrEspece == Espece & Placette %in% listePlacette) %>%
-      mutate(Yvar = NA)
+  Data <- SortieDendroSamare(SimulHtVol) %>%
+    lazy_dt() %>%
+    filter(GrEspece == Espece & Placette %in% listePlacette) %>%
+    mutate(Yvar = NA) %>%
+    as.data.frame()
+
+  Data <- Data %>%
+    lazy_dt() %>%
+    group_by(Placette, Annee) %>%
+    slice_tail() %>%
+    ungroup() %>%
+    as.data.frame()
+
+  switch(Variable,
+    "Vol_HA" = {
+      Data$Yvar <- Data$Vol_HA
+      Etiquette <- "Volume marchand (m3/ha)"
+    },
+    "ST_HA" = {
+      Data$Yvar <- Data$ST_HA
+      Etiquette <- "Surface terri\uE8re marchande (m2/ha)"
+    },
+    "DQM" = {
+      Data$Yvar <- Data$DQM
+      Etiquette <- "Diam\uE8tre quadratique moyen (cm)"
+    },
+    "HDomM" = {
+      Data$Yvar <- Data$HDomM
+      Etiquette <- "Hauteur dominante (m)"
+    },
+    "nbTi_HA" = {
+      Data$Yvar <- Data$nbTi_HA
+      Etiquette <- "Densit\uE9 (nb/ha)"
+    }
   )
 
-  Data <- as.data.frame(
-    lazy_dt(Data) %>% # Permet de retirer le Residuel=0 dans le cas où on a également un résiduel=1 pour la même année
-      group_by(Placette, Annee) %>%
-      slice_tail() %>%
-      ungroup()
+  switch(Espece,
+    "TOT" = {
+      Essence <- "Toutes essences"
+    },
+    "BOJ" = {
+      Essence <- "Bouleau jaune"
+    },
+    "ERR" = {
+      Essence <- "\uC9rable rouge"
+    },
+    "ERS" = {
+      Essence <- "\uC9rable \uE0 sucre"
+    },
+    "FEN" = {
+      Essence <- "Feuillus nobles"
+    },
+    "FIN" = {
+      Essence <- "Feuillus intol\uE9rants"
+    },
+    "EPX" = {
+      Essence <- "\uC9pinettes"
+    },
+    "SAB" = {
+      Essence <- "Sapin baumier"
+    },
+    "RES" = {
+      Essence <- "R\uE9sineux"
+    },
+    "HEG" = {
+      Essence <- "H\uEAtre \uE0 grandes feuilles"
+    },
+    "AUT" = {
+      Essence <- "Autres essences"
+    }
   )
-
-  if (Variable == "Vol_HA") {
-    Data$Yvar <- Data$Vol_HA
-    Etiquette <- "Volume marchand (m3/ha)"
-  }
-
-  if (Variable == "ST_HA") {
-    Data$Yvar <- Data$ST_HA
-    Etiquette <- "Surface terri\uE8re marchande (m2/ha)"
-  }
-
-  if (Variable == "DQM") {
-    Data$Yvar <- Data$DQM
-    Etiquette <- "Diam\uE8tre quadratique moyen (cm)"
-  }
-
-  if (Variable == "HDomM") {
-    Data$Yvar <- Data$HDomM
-    Etiquette <- "Hauteur dominante (m)"
-  }
-
-  if (Variable == "nbTi_HA") {
-    Data$Yvar <- Data$nbTi_HA
-    Etiquette <- "Densit\uE9 (nb/ha)"
-  }
-
-  if (Espece == "TOT") {
-    Essence <- "Toutes essences"
-  }
-
-  if (Espece == "BOJ") {
-    Essence <- "Bouleau jaune"
-  }
-
-  if (Espece == "ERR") {
-    Essence <- "\uC9rable rouge"
-  }
-
-  if (Espece == "ERS") {
-    Essence <- "\uC9rable \uE0 sucre"
-  }
-
-  if (Espece == "FEN") {
-    Essence <- "Feuillus nobles"
-  }
-
-  if (Espece == "FIN") {
-    Essence <- "Feuillus intol\uE9rants"
-  }
-
-  if (Espece == "EPX") {
-    Essence <- "\uC9pinettes"
-  }
-
-  if (Espece == "SAB") {
-    Essence <- "Sapin baumier"
-  }
-
-  if (Espece == "RES") {
-    Essence <- "R\uE9sineux"
-  }
-
-  if (Espece == "HEG") {
-    Essence <- "H\uEAtre \uE0 grandes feuilles"
-  }
-
-  if (Espece == "AUT") {
-    Essence <- "Autres essences"
-  }
 
   ymax <- max(Data$Yvar)
 
   AnneeDep <- min(Data$Annee)
   AnneeFin <- max(Data$Annee)
 
-  dernieres_valeurs <- as.data.frame(
-    lazy_dt(Data) %>%
-      group_by(Placette) %>%
-      slice(n()) %>%
-      ungroup()
-  )
+  dernieres_valeurs <- Data %>%
+    lazy_dt() %>%
+    group_by(Placette) %>%
+    slice(n()) %>%
+    ungroup() %>%
+    as.data.frame()
 
   GraphEvol <- Data %>%
     ggplot(aes(x = Annee, y = Yvar, group = Placette, label = Placette)) +
@@ -131,21 +115,23 @@ Graph <- function(SimulHtVol, Espece = "TOT", Variable = "ST_HA", listePlacette)
 
   NbPlac <- length(unique(SimulHtVol$Placette))
 
-  Sommaire <- as.data.frame(
-    lazy_dt(Sommaire_Classes_DHP(SimulHtVol)) %>%
-      filter((Annee %in% c(AnneeDep, AnneeFin)) & GrEspece == Espece & (Placette %in% listePlacette)) %>%
-      mutate(DHP_cl = round(DHP_cl / 5) * 5) %>%
-      group_by(Annee, DHP_cl) %>%
-      summarise(NbHa = (sum(NbHa) / NbPlac), .groups = "drop")
-  )
+  Sommaire <- Sommaire_Classes_DHP(SimulHtVol) %>%
+    lazy_dt() %>%
+    filter((Annee %in% c(AnneeDep, AnneeFin)) & GrEspece == Espece & (Placette %in% listePlacette)) %>%
+    mutate(DHP_cl = round(DHP_cl / 5) * 5) %>%
+    group_by(Annee, DHP_cl) %>%
+    summarise(NbHa = (sum(NbHa) / NbPlac), .groups = "drop") %>%
+    as.data.frame()
 
   MaxDHP <- max(Sommaire$DHP_cl)
 
   ClassesDHP <- data.frame("Annee" = c(rep(AnneeDep, 13), rep(AnneeFin, 13)), "DHP_cl" = rep(seq(10, 70, by = 5), 2))
 
   GraphDist <- Sommaire %>%
+    lazy_dt() %>%
     full_join(ClassesDHP, relationship = "many-to-many", by = join_by(Annee, DHP_cl)) %>%
     mutate(NbHa = ifelse(is.na(NbHa) == TRUE, 0, NbHa), Annee = as.factor(Annee)) %>%
+    as.data.frame() %>%
     ggplot(aes(x = DHP_cl, y = NbHa, fill = Annee)) +
     geom_bar(position = position_dodge(preserve = "single"), stat = "identity", color = "black", width = 3) +
     ggtitle(paste("Distribution diam\uE9trale", "  ", Essence)) +
