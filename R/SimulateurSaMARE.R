@@ -27,6 +27,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
   Data <- renommer_les_colonnes(Data)
 
   Gaules <- if (!missing(Gaules)) renommer_les_colonnes_gaules(Gaules) else NA
+
   Data <- Data %>%
     lazy_dt() %>%
     filter(DHPcm >= 9) %>%
@@ -37,7 +38,6 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
   # Fichier des effets aleatoires
   CovParms <- MatchModuleCovparms
   EfCovParms <- EffetCovParms
-
   CovParmsGaules <- CovparmGaules
 
   ####### Fichier des parametres
@@ -120,8 +120,10 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
   ##################### Génération des effets aléatoires###########################
   ###############################################################################
   RandPlacStep <- RandomPlacStep(
-    CovParms = CovParms, Data = Data,
-    NbIter = NbIter, NbPeriodes = Horizon
+    CovParms = CovParms,
+    Data = Data,
+    NbIter = NbIter,
+    NbPeriodes = Horizon
   )
 
   ###################### Gaules###########
@@ -132,8 +134,8 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
     )
   }
 
-  ################################################################################
-  ########################### Copie des données initiale * Nb Iter################
+  ##############################################################################
+  ########################### Copie des données initiale * Nb Iter##############
   ##############################################################################
   ListeIter <- rep(1:NbIter)
   ListeIter <- Data %>%
@@ -154,31 +156,13 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
   list_plot <- unique(ListeIter$PlacetteID)
 
   # utilisation de doRNG permet de controler la seed
-  Simul <- bind_rows(
-    # foreach(x = list_plot) %dorng% {
+  Simul <- foreach(x = list_plot, .combine = bind_rows) %do% {
     SaMARE(
       Random = RandPlacStep,
       RandomGaules = RandPlacStepGaules,
       Data = Data,
       Gaules = Gaules,
-      ListeIter = ListeIter[ListeIter$PlacetteID == "TEM23APC5000_1", ],
-      Annee_Inventaire = anneeInventaire,
-      Horizon = Horizon,
-      RecruesGaules = RecruesGaules,
-      MCH = MCH,
-      CovParms = CovParms,
-      CovParmsGaules = CovParmsGaules,
-      Para = Para,
-      ParaGaules = ParaGaules,
-      Omega = Omega,
-      OmegaGaules = OmegaGaules
-    ),
-    SaMARE(
-      Random = RandPlacStep,
-      RandomGaules = RandPlacStepGaules,
-      Data = Data,
-      Gaules = Gaules,
-      ListeIter = ListeIter[ListeIter$PlacetteID == "TEM23APC5000_2", ],
+      ListeIter = ListeIter[ListeIter$PlacetteID == x, ],
       Annee_Inventaire = anneeInventaire,
       Horizon = Horizon,
       RecruesGaules = RecruesGaules,
@@ -190,10 +174,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
       Omega = Omega,
       OmegaGaules = OmegaGaules
     )
-    # }
-  )
-
-  browser()
+  }
 
   plan(sequential)
 

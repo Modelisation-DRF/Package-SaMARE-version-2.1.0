@@ -16,12 +16,12 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
 
   PlacQual <- PlacQual %>%
     lazy_dt() %>%
-    mutate(GrDHP = ifelse(DHPcm1 < 33.1, "C", ifelse(DHPcm1 >= 39.1 & GrEspece %in% c("BOJ", "ERS", "HEG"), "A", "B"))) %>%
     mutate(
+      GrDHP = ifelse(DHPcm1 < 33.1, "C", ifelse(DHPcm1 >= 39.1 & GrEspece %in% c("BOJ", "ERS", "HEG"), "A", "B")),
       dtr = ifelse((DHPcm < 33.1 & DHPcm1 >= 33.1) | (DHPcm < 39.1 & DHPcm1 >= 39.1 & GrEspece %in% c("BOJ", "ERS", "HEG")), 1, 0),
-      Intercept = 1
+      Intercept = 1,
+      ABCD = ifelse(GrEspece %in% c("ERR", "FIN", "FEN") & ABCD == "A", "B", ABCD)
     ) %>%
-    mutate(ABCD = ifelse(GrEspece %in% c("ERR", "FIN", "FEN") & ABCD == "A", "B", ABCD)) %>%
     as.data.frame()
 
   PlacQualB <- PlacQual %>%
@@ -39,7 +39,7 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
   PlacQual <- PlacQual %>%
     lazy_dt() %>%
     as.data.frame() %>%
-    rbind(PlacQualB, PlacQualA)%>%
+    rbind(PlacQualB, PlacQualA) %>%
     lazy_dt() %>%
     arrange(ArbreID, Intercept) %>%
     as.data.frame()

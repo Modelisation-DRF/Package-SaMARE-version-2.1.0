@@ -15,7 +15,6 @@ test_that("Test Recrutement_Dhp", {
   actual <- data.frame(V1 = actual)
   actual <- actual %>% mutate(V1 = round(V1, 7))
 
-
   Result_Recrutement_Dhp_test <- readRDS(test_path("fixtures", "Result_Recrutement_Dhp_test.rds"))
   expected <- data.frame(V1 = Result_Recrutement_Dhp_test)
   expected <- expected %>% mutate(V1 = round(V1, 7))
