@@ -38,7 +38,9 @@ EvolQual <- function(PlacQual, type_pe_Plac, prec, rid1, dens_tot0, Para.EvolQua
 
   PlacQual <- PlacQual %>%
     lazy_dt() %>%
-    rbind(PlacQualB, PlacQualA) %>%
+    as.data.frame() %>%
+    rbind(PlacQualB, PlacQualA)%>%
+    lazy_dt() %>%
     arrange(ArbreID, Intercept) %>%
     as.data.frame()
 

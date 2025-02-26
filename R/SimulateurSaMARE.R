@@ -32,7 +32,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
     filter(DHPcm >= 9) %>%
     as.data.frame()
 
-  AnneeDep <- as.numeric(format(Sys.Date(), "%Y"))
+  anneeInventaire <- as.numeric(format(Sys.Date(), "%Y"))
 
   # Fichier des effets aleatoires
   CovParms <- MatchModuleCovparms
@@ -153,18 +153,33 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
   # liste de placette/iter, donc on parallélise les placettes/iter
   list_plot <- unique(ListeIter$PlacetteID)
 
-  cluster1 <- makeCluster(coreNumbers)
-  registerDoParallel(cluster1)
-
-  ###### utilisation de doRNG permet de controler la seed
-  clusterResult <- foreach(x = list_plot) %dorng% {
+  # utilisation de doRNG permet de controler la seed
+  Simul <- bind_rows(
+    # foreach(x = list_plot) %dorng% {
     SaMARE(
       Random = RandPlacStep,
       RandomGaules = RandPlacStepGaules,
       Data = Data,
       Gaules = Gaules,
-      ListeIter = ListeIter[ListeIter$PlacetteID == x, ],
-      Annee_Inventaire = AnneeDep,
+      ListeIter = ListeIter[ListeIter$PlacetteID == "TEM23APC5000_1", ],
+      Annee_Inventaire = anneeInventaire,
+      Horizon = Horizon,
+      RecruesGaules = RecruesGaules,
+      MCH = MCH,
+      CovParms = CovParms,
+      CovParmsGaules = CovParmsGaules,
+      Para = Para,
+      ParaGaules = ParaGaules,
+      Omega = Omega,
+      OmegaGaules = OmegaGaules
+    ),
+    SaMARE(
+      Random = RandPlacStep,
+      RandomGaules = RandPlacStepGaules,
+      Data = Data,
+      Gaules = Gaules,
+      ListeIter = ListeIter[ListeIter$PlacetteID == "TEM23APC5000_2", ],
+      Annee_Inventaire = anneeInventaire,
       Horizon = Horizon,
       RecruesGaules = RecruesGaules,
       MCH = MCH,
@@ -175,11 +190,10 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
       Omega = Omega,
       OmegaGaules = OmegaGaules
     )
-  }
+    # }
+  )
 
-  Simul <- bind_rows(clusterResult)
-
-  stopCluster(cluster1)
+  browser()
 
   plan(sequential)
 
@@ -197,7 +211,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
   Simul <- Simul %>%
     lazy_dt() %>%
     inner_join(VarEco, relationship = "many-to-many", by = "Placette") %>%
-    mutate(nb_tige = Nombre / Sup_PE / 25, step = (Annee - AnneeDep) / 5 + 1) %>% # Conversion pour relation HD
+    mutate(nb_tige = Nombre / Sup_PE / 25, step = (Annee - anneeInventaire) / 5 + 1) %>% # Conversion pour relation HD
     rename(
       id_pe = Placette, dhpcm = DHPcm, no_arbre = ArbreID, # IA: j'ai enlevé essence=GrEspece
       altitude = Altitude, p_tot = Ptot, t_ma = Tmoy, iter = Iter
@@ -208,7 +222,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
     lazy_dt() %>%
     group_by(GrEspece) %>%
     slice(1) %>%
-    dplyr::select(-Espece) %>%
+    select(-Espece) %>%
     as.data.frame()
 
   Simul <- left_join(Simul, ass_ess_ht_vol2, by = "GrEspece")
@@ -222,13 +236,19 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
     rename(essence = essence_hauteur) %>%
     as.data.frame()
 
+  ht <- TarifQC::relation_h_d(fic_arbres = SimulHtVol1, mode_simul = "STO", nb_iter = ifelse(nb_iter == 1, nb_iter + 1, nb_iter), nb_step = nb_periodes, reg_eco = TRUE, dt = 5) %>%
+    lazy_dt() %>%
+    select(-essence) %>%
+    as.data.frame()
+
   ht <- ht %>%
     lazy_dt() %>%
     rename(essence = essence_volume) %>%
     as.data.frame()
-  SimulHtVol2 <- TarifQC::cubage(fic_arbres = ht, mode_simul = "STO", nb_iter = nb_iter, nb_step = nb_periodes) %>%
+
+  SimulHtVol2 <- TarifQC::cubage(fic_arbres = ht, mode_simul = "STO", nb_iter = ifelse(nb_iter == 1, nb_iter + 1, nb_iter), nb_step = nb_periodes) %>%
     lazy_dt() %>%
-    dplyr::select(-essence) %>%
+    select(-essence) %>%
     as.data.frame()
 
   rm(SimulHtVol1)
@@ -245,7 +265,7 @@ SimulSaMARE <- function(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0, c
     ) %>%
     mutate(PlacetteID = paste(Placette, "_", Iter, sep = "")) %>%
     # enlever les variables qui étaient nécessaire seulement pour tarifqc
-    dplyr::select(-milieu, -veg_pot, -essence_hauteur, -essence_volume, -step, -nb_tige) %>%
+    select(-milieu, -veg_pot, -essence_hauteur, -essence_volume, -step, -nb_tige) %>%
     as.data.frame()
 
   return(SimulHtVol)

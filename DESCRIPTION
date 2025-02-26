@@ -19,24 +19,25 @@ RoxygenNote: 7.3.2
 Imports:
     Billonage,
     TarifQC
-Depends: mvtnorm,
+Depends: 
+        data.table,
+        doFuture,
+        doParallel,
+        doRNG,
         dplyr,
         dtplyr,
-        data.table,
-        tidyverse,
-        tidyfast,
-        doParallel,
+        future.apply,
+        iterators,
+        magrittr,
+        miceadds,
+        mvtnorm,
         parallel,
         parallelly,
-        iterators,
-        doFuture,
-        doRNG,
-        miceadds,
-        future.apply,
-        data.table,
+        R (>= 2.10),
         rlang,
         rockchalk,
-        R (>= 2.10)
+        tidyfast,
+        tidyverse
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
