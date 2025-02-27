@@ -37,16 +37,28 @@ RandomPlacStep <- function(CovParms, Data, NbIter, NbPeriodes) {
     )
   }
 
+  # DTPLYR AND DATA.TABLE DON'T LIKE map/lapply, GIVES DIFFERENT VALUES THAN DPLYR (BUT DTPLYR == DATA.TABLE)
   PredRandPlac <- RandPlac %>%
-    lazy_dt() %>%
     mutate(ID = paste(Placette, "_", SubModuleID)) %>%
     group_by(ID) %>%
     nest() %>%
     mutate(RandPlac = map(data, randPlac)) %>%
     ungroup() %>%
     dt_unnest(RandPlac) %>%
-    select(-data, -ID) %>%
-    as.data.frame()
+    select(-data, -ID)
+
+  # PredRandPlac <- RandPlac %>%
+  #   lazy_dt() %>%
+  #   mutate(ID = paste(Placette, "_", SubModuleID)) %>%
+  #   group_by(ID) %>%
+  #   dt_nest() %>%
+  #   as.data.frame() %>%
+  #   mutate(RandPlac = map(data, randPlac)) %>%
+  #   lazy_dt() %>%
+  #   ungroup() %>%
+  #   dt_unnest(RandPlac) %>%
+  #   select(-data, -ID) %>%
+  #   as.data.frame()
 
   PredRandPlac <- PredRandPlac %>%
     lazy_dt() %>%
@@ -81,16 +93,28 @@ RandomPlacStep <- function(CovParms, Data, NbIter, NbPeriodes) {
     )
   }
 
+  # DTPLYR AND DATA.TABLE DON'T LIKE map/lapply, GIVES DIFFERENT VALUES THAN DPLYR (BUT DTPLYR == DATA.TABLE)
   PredRandStep <- RandStep %>%
-    lazy_dt() %>%
     mutate(ID = paste(Placette, "_", SubModuleID, "_", Step)) %>%
     group_by(ID) %>%
     nest() %>%
     mutate(RandStep = map(data, randStep)) %>%
     ungroup() %>%
-    dt_unnest(RandStep) %>%
-    select(-data, -ID) %>%
-    as.data.frame()
+    unnest(RandStep) %>%
+    select(-data, -ID)
+
+  # PredRandStep <- RandStep %>%
+  #   lazy_dt() %>%
+  #   mutate(ID = paste(Placette, "_", SubModuleID, "_", Step)) %>%
+  #   group_by(ID) %>%
+  #   dt_nest() %>%
+  #   as.data.frame() %>%
+  #   mutate(RandStep = map(data, randStep)) %>%
+  #   lazy_dt() %>%
+  #   ungroup() %>%
+  #   dt_unnest(RandStep) %>%
+  #   select(-data, -ID) %>%
+  #   as.data.frame()
 
   suppressMessages(
     Random <- left_join(PredRandPlac, PredRandStep)
@@ -153,16 +177,18 @@ RandomPlacStepGaules <- function(CovParms, Data, NbIter) {
     unnest(RandPlac) %>%
     select(-data, -ID)
 
-  # PredRandPlac <- as.data.frame(
-  #   lazy_dt(RandPlac) %>%
-  #     mutate(ID = paste(Placette, "_", SubModuleID, "_", response)) %>%
-  #     group_by(ID) %>%
-  #     dt_nest() %>%
-  #     mutate(RandPlac = map(data, randPlac)) %>%
-  #     ungroup() %>%
-  #     dt_unnest(RandPlac) %>%
-  #     select(-data, -ID)
-  # )
+# PredRandPlac <- RandPlac %>%
+#   lazy_dt() %>%
+#   mutate(ID = paste(Placette, "_", SubModuleID, "_", response)) %>%
+#   group_by(ID) %>%
+#   dt_nest() %>%
+#   as.data.frame() %>%
+#   mutate(RandPlac = map(data, randPlac)) %>%
+#   lazy_dt() %>%
+#   ungroup() %>%
+#   dt_unnest(RandPlac) %>%
+#   select(-data, -ID) %>%
+#   as.data.frame()
 
   PredRandPlac <- PredRandPlac %>%
     lazy_dt() %>%
