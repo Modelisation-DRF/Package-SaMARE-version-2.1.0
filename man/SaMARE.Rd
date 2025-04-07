@@ -13,7 +13,7 @@ SaMARE(
   Data,
   Gaules,
   ListeIter,
-  AnneeDep,
+  Annee_Inventaire,
   Horizon,
   RecruesGaules,
   MCH,
@@ -45,7 +45,7 @@ simuler ainsi que des variables nécessaire à la simulation.}
 \item{ListeIter}{Un dataframe contenant le numéro de la placette à simuler
 et le numéro de l'iteration à effecuer.}
 
-\item{AnneeDep}{Année de départ de la simulation.}
+\item{Annee_Inventaire}{Année de départ de la simulation.}
 
 \item{Horizon}{Nombre de pas de 5 ans de simulation à effectuer.}
 
