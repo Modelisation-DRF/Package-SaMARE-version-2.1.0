@@ -39,10 +39,8 @@
 #' @export
 
 
-SimulSaMARE<-function(NbIter,Horizon,RecruesGaules,Data,Gaules ,MCH=0){
+SimulSaMARE<-function(NbIter,Horizon,RecruesGaules=0,Data,Gaules=NULL,MCH=0){
 
-  # NbIter=2; Horizon=2; RecruesGaules=1; Data = Test400m2Coupe; Gaules = GaulesTest2500m2; MCH = 0;
-  # NbIter=2; Horizon=2; RecruesGaules=0; Data = Test2500m2; Gaules = NULL; MCH = 0;
 
   select=dplyr::select
   ################################ Lecture des fichiers de placette et de parametres ###################

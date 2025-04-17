@@ -7,7 +7,7 @@ test_that("SaMARE returns the expected data frame without Gaules and MCH = 0", {
 
   Data_test_for_simul_samare <- readRDS(test_path("fixtures", "Data_test_for_simul_samare.rds"))
   RandomTest <- readRDS(test_path("fixtures", "RandomTest.rds"))
-  result_simul2<-SaMARE(Random =RandomTest, Data = Data_test_for_simul_samare, Gaules =NA, ListeIter=ListeItertest, AnneeDep=2023,
+  result_simul2<-SaMARE(Random =RandomTest, Data = Data_test_for_simul_samare, Gaules =NA, ListeIter=ListeItertest,Annee_Inventaire=2023,
                     Horizon = 6 ,
                     RecruesGaules =0,CovParms=MatchModuleCovparms,CovParmsGaules=CovparmGaules,
                     Para=MatchModuleParameters,ParaGaules=ParametresGaules,Omega=MatchModuleOmega, OmegaGaules=OmegaGaulesFormat, MCH = 0)
@@ -28,7 +28,7 @@ test_that("SaMARE returns the expected data frame without Gaules and MCH = 1", {
   Data_test_for_simul_samare <- readRDS(test_path("fixtures", "Data_test_for_simul_samare.rds"))
   RandomTest <- readRDS(test_path("fixtures", "RandomTest.rds"))
   result_simul2<-SaMARE(Random =RandomTest, Data = Data_test_for_simul_samare, Gaules =NA, ListeIter=ListeItertest,
-                        AnneeDep=2023, Horizon = 6 ,
+                        Annee_Inventaire=2023, Horizon = 6 ,
                         RecruesGaules =0,CovParms=MatchModuleCovparms,CovParmsGaules=CovparmGaules,
                         Para=MatchModuleParameters,ParaGaules=ParametresGaules,Omega=MatchModuleOmega, OmegaGaules=OmegaGaulesFormat, MCH = 1)
 
@@ -50,7 +50,7 @@ test_that("SaMARE returns the expected data frame with Gaules MCH=0", {
   RandPlacStepGaules_test <- readRDS(test_path("fixtures", "RandPlacStepGaules_test.rds"))
   Gaules_test <- readRDS(test_path("fixtures", "Gaules_test.rds"))
   result_simul<-SaMARE(Random =RandomTest,RandomGaules=RandPlacStepGaules_test, Data = Data_test_for_simul_samare,
-                       Gaules =Gaules_test, ListeIter=ListeItertest, AnneeDep=2023, Horizon = 6 ,
+                       Gaules =Gaules_test, ListeIter=ListeItertest, Annee_Inventaire=2023, Horizon = 6 ,
                         RecruesGaules =1,CovParms=MatchModuleCovparms,CovParmsGaules=CovparmGaules,
                         Para=MatchModuleParameters,ParaGaules=ParametresGaules,Omega=MatchModuleOmega, OmegaGaules=OmegaGaulesFormat, MCH = 0)
 
@@ -72,7 +72,7 @@ test_that("SaMARE returns the expected data frame with Gaules MCH=1", {
   Data_test_for_simul_samare <- readRDS(test_path("fixtures", "Data_test_for_simul_samare.rds"))
   Gaules_test <- readRDS(test_path("fixtures", "Gaules_test.rds"))
   result_simul<-SaMARE(Random =RandomTest,RandomGaules=RandPlacStepGaules_test, Data = Data_test_for_simul_samare,
-                       Gaules =Gaules_test, ListeIter=ListeItertest, AnneeDep=2023, Horizon = 6 ,
+                       Gaules =Gaules_test, ListeIter=ListeItertest, Annee_Inventaire=2023, Horizon = 6 ,
                        RecruesGaules =1,CovParms=MatchModuleCovparms,CovParmsGaules=CovparmGaules,
                        Para=MatchModuleParameters,ParaGaules=ParametresGaules,Omega=MatchModuleOmega, OmegaGaules=OmegaGaulesFormat, MCH = 1)
 
