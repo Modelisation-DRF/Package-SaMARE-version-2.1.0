@@ -34,4 +34,5 @@ install_github("https://github.com/Modelisation-DRF/Package-SaMARE-version-2.1.0
 | Date |  Version  | Issues |      Détails     |
 |:-----|:---------:|:-------|:-----------------|
 | 2024-04-05 |	2.1.0 |		Version stable |
-| 2025-02-04 |  2.3.1 |   | Version incluant les corrections et améliorations effectuées suites aux validations des chercheurs sans la validation statistique du modèle (calcul biais et erreurs)
+| 2025-02-04 |  2.3.1 |   Version incluant les corrections et améliorations effectuées suites aux validations des chercheurs sans la                              validation statistique du modèle (calcul biais et erreurs)|
+| 2025-04-16 | 2.3.2 |    Version avec limitation de la variable temps après|

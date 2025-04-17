@@ -11,6 +11,8 @@ saveRDS(expect_for_Samare_avec_gaules_et_coupe_test_MCH, "tests/testthat/fixture
 saveRDS(expect_for_Samare_sans_gaules_et_coupe_test, "tests/testthat/fixtures/expect_for_Samare_sans_gaules_et_coupe_test.rds")
 saveRDS(expect_for_Samare_sans_gaules_et_coupe_test_MCH, "tests/testthat/fixtures/expect_for_Samare_sans_gaules_et_coupe_test_MCH.rds")
 saveRDS(expect_for_Samare_sans_gaules_test, "tests/testthat/fixtures/expect_for_Samare_sans_gaules_test.rds")
+saveRDS(expect_for_Samare_sans_gaules_avec_coupe_et_MCH_test, "tests/testthat/fixtures/expect_for_Samare_sans_gaules_avec_coupe_et_MCH_test.rds")
+saveRDS(expect_for_Samare_sans_gaules_avec_coupe_avec_MCH_test, "tests/testthat/fixtures/expect_for_Samare_sans_gaules_avec_coupe_avec_MCH_test.rds")
 
 saveRDS(expect_for_arbre_samare, "tests/testthat/fixtures/expect_for_arbre_samare.rds")
 saveRDS(expect_for_denro, "tests/testthat/fixtures/expect_for_denro.rds")

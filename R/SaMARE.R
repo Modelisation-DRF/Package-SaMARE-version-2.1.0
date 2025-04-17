@@ -387,7 +387,7 @@ SaMARE<- function(Random, RandomGaules, Data, Gaules, ListeIter, Annee_Inventair
     }
 
     #Temps depuis coupe
-    if(trt=="CP"){
+    if(trt=="CP" & Plac$Annee[1]-t0<=25){         ###Si la coupe date de plus que 20 ans (25 ans dans le code car Plac$Annee a déjà été augmenté de 5 ans) t0_aj est mis à 0
       t0_aj_<-Plac$Annee[1]-t0-4.9}else{t0_aj_=0} ######on ajuste pour que lorsque la step débute immédiatement après coupe t0_aj a une valeur de 0.1
 
     #Réduction de la mortalité
