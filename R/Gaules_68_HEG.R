@@ -81,7 +81,7 @@ count68HEG<-function(RecGaules,Ratio,Rec,Iterj,RandomPlacGaules,Para.68_HEG){
 
   Random<-RandomPlacGaules$RandomPlac[which(RandomPlacGaules$SubModuleID==14 & RandomPlacGaules$response=="count")]
 
-  pred<-exp(logit+Random)
+  pred<-exp(logit+Random)-1
 
   return(pred)
 
