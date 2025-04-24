@@ -214,7 +214,7 @@ SimulSaMARE<-function(NbIter,Horizon,RecruesGaules=0,Data,Gaules=NULL,MCH=0){
     debut <- (i - 1) * taille_lot + 1
     fin <- min(i * taille_lot, n)
     lot <- SimulHtVol1[debut:fin, ]
-    resultats[[i]] <- TarifQC::relation_h_d(fic_arbres=lot, mode_simul='STO', nb_iter=nb_iter, nb_step=nb_periodes, reg_eco = TRUE, dt =5)
+    resultats[[i]] <- OutilsDRF::relation_h_d(fic_arbres=lot, mode_simul='STO', nb_iter=nb_iter, nb_step=nb_periodes, reg_eco = TRUE, dt =5)
   }
 
   resultats<-do.call(rbind, resultats)
@@ -240,7 +240,7 @@ SimulSaMARE<-function(NbIter,Horizon,RecruesGaules=0,Data,Gaules=NULL,MCH=0){
     debut <- (i - 1) * taille_lot + 1
     fin <- min(i * taille_lot, n)
     lot <- SimulHtVol1[debut:fin, ]
-    resultats[[i]] <- TarifQC::cubage(fic_arbres=lot, mode_simul='STO', nb_iter=nb_iter, nb_step=nb_periodes)
+    resultats[[i]] <- OutilsDRF::cubage(fic_arbres=lot, mode_simul='STO', nb_iter=nb_iter, nb_step=nb_periodes)
   }
 
   resultats<-do.call(rbind, resultats)
