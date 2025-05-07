@@ -22,25 +22,25 @@ SortieDendroIterSamare <- function(SimulHtVol,simplifier=FALSE){
   DendroIterSamaresp <- SimulHtVol %>%
                     mutate(Etat=ifelse(Etat=="mort","mort","vivant")) %>%
                     filter(Etat=="vivant") %>%
-                    mutate (Stm2ha=pi*(DHPcm/200)^2/Sup_PE,
-                            vol_dm3=ifelse(is.na(vol_dm3)==TRUE,0,vol_dm3/Sup_PE)) %>%
+                    mutate (Stm2ha=pi*(DHPcm/200)^2*Nombre/Sup_PE,
+                            vol_dm3=ifelse(is.na(vol_dm3)==TRUE,0,vol_dm3*Nombre/Sup_PE)) %>%
                     arrange(  desc(hauteur_pred))%>%
                     group_by(Placette,Iter,Annee,GrEspece,Etat,Residuel) %>%
                     mutate(NbCum=cumsum(Nombre)) %>%
                     summarise(ST_HA=sum(Stm2ha),Vol_HA=sum(vol_dm3)/1000,nbTi_HA=sum(Nombre/Sup_PE),DQM=(ST_HA/nbTi_HA/pi)^0.5*200,
-                              HDomM=ifelse(nbTi_HA>100,mean(hauteur_pred[1:first(which((NbCum/Sup_PE)>=100))],na.rm = TRUE),mean(hauteur_pred)), .groups="drop")
+                              HDomM=ifelse(nbTi_HA>=100,mean(hauteur_pred[1:first(which((NbCum/Sup_PE)>=100))],na.rm = TRUE),NA), .groups="drop")
 
 
 
   DendroIterSamare <- SimulHtVol %>%
                      mutate(Etat=ifelse(Etat=="mort","mort","vivant")) %>%
-                     mutate (Stm2ha=pi*(DHPcm/200)^2/Sup_PE,
-                             vol_dm3=ifelse(is.na(vol_dm3)==TRUE,0,vol_dm3/Sup_PE)) %>%
+                     mutate (Stm2ha=pi*(DHPcm/200)^2*Nombre/Sup_PE,
+                             vol_dm3=ifelse(is.na(vol_dm3)==TRUE,0,vol_dm3*Nombre/Sup_PE)) %>%
                      arrange( desc(hauteur_pred))%>%
                      group_by(Placette,Iter,Annee,Etat,Residuel) %>%
                      mutate(NbCum=cumsum(Nombre)) %>%
                      summarise(ST_HA=sum(Stm2ha), Vol_HA=sum(vol_dm3)/1000, nbTi_HA=sum(Nombre/Sup_PE), DQM=(ST_HA/nbTi_HA/pi)^0.5*200,
-                               HDomM=ifelse(nbTi_HA>100,mean(hauteur_pred[1:first(which((NbCum/Sup_PE)>=100))],na.rm = TRUE),mean(hauteur_pred)), .groups="drop") %>%
+                               HDomM=ifelse(nbTi_HA>=100,mean(hauteur_pred[1:first(which((NbCum/Sup_PE)>=100))],na.rm = TRUE),NA), .groups="drop") %>%
                     mutate(DQM=ifelse(Etat=="mort",NA,DQM),ST_HA=ifelse(Etat=="mort",NA,ST_HA),
                                       Vol_HA=ifelse(Etat=="mort",NA,Vol_HA),HDomM=ifelse(Etat=="mort",NA,HDomM)) %>%
                     mutate(GrEspece="TOT") %>%
