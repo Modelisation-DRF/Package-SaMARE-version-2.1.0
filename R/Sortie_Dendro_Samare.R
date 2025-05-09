@@ -146,7 +146,7 @@ if(simplifier == TRUE){
   DendroIterSamare_simp_min <-DendroSamare %>% filter(Annee==MinAnnee )
   DendroIterSamare_simp_maxa <-DendroSamare %>%
                               filter(Annee==MaxAnnee ) %>%
-                              select(-AACAccrM2HaAn,-AACMortM2HaAn,-AACRecrM2HaAn,-AACBrut,-AACBrut)
+                              select(-AACAccrM2HaAn,-AACMortM2HaAn,-AACRecrM2HaAn,-AACBrut,-AACNet)
 
   DendroIterSamare_simp_maxb <-DendroSamare %>%
                               filter(Annee!=MinAnnee) %>%
@@ -155,7 +155,7 @@ if(simplifier == TRUE){
                                      AACMortM2HaAn=sum(AACMortM2HaAn)/Horizon,
                                      AACRecrM2HaAn=sum(AACRecrM2HaAn)/Horizon,
                                      AACBrut=sum(AACBrut)/Horizon,
-                                     AACBrut=sum(AACNet)/Horizon)
+                                     AACNet=sum(AACNet)/Horizon)
   suppressMessages(
   DendroIterSamare_simp_max <-DendroIterSamare_simp_maxa %>%
                               left_join(DendroIterSamare_simp_maxb))
