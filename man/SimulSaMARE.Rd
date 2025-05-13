@@ -5,7 +5,7 @@
 \title{Fonction qui sert à appeler le simulateur SaMARE et qui fournit les données
 initiales ainsi qu'un choix de paramètres pour la simulation.}
 \usage{
-SimulSaMARE(NbIter, Horizon, RecruesGaules, Data, Gaules, MCH = 0)
+SimulSaMARE(NbIter, Horizon, RecruesGaules = 0, Data, Gaules = NULL, MCH = 0)
 }
 \arguments{
 \item{NbIter}{Valeur numérique du nombre d'iterations à effectuer (ex: 30).}
