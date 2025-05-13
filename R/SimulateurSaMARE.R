@@ -152,7 +152,7 @@ SimulSaMARE<-function(NbIter,Horizon,RecruesGaules=0,Data,Gaules=NULL,MCH=0){
 
   registerDoFuture()
   options(future.globals.maxSize= 891289600)###Monte la tolérence à 850 megs pour les éléments passés dans do futur
-  plan(multisession, workers=15)
+  plan(multisession, workers=availableCores()/2)
 
   list_plot <- unique(ListeIter$PlacetteID) # liste de placette/iter, donc on parallélise les placettes/iter
   list_annedep <- sub("(_[0-9]+)$", "", list_plot)#Copie le no de placette le même nombre que le nombre iterations
