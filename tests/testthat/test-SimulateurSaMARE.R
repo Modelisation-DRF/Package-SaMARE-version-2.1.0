@@ -56,14 +56,14 @@ test_that("simulateur SaMARE return the expected data with coupe and without Gau
 
   set.seed(NULL)
 
-  expect_for_Samare_sans_gaules_et_coupe_test <- readRDS(test_path("fixtures", "expect_for_Samare_sans_gaules_avec_coupe_et_MCH_test.rds"))
+  expect_for_Samare_sans_gaules_et_coupe_test <- readRDS(test_path("fixtures", "expect_for_Samare_sans_gaules_et_coupe_test.rds"))
   expect_for_Samare_sans_gaules_et_coupe_test <- expect_for_Samare_sans_gaules_et_coupe_test %>% mutate(vol_dm3 = round(vol_dm3,0), hauteur_pred = round(hauteur_pred,1))
   expect_equal(Result, expect_for_Samare_sans_gaules_et_coupe_test  )
 })
 
 
 
-test_that("simulateur SaMARE return the expected data with gaules and without Gaules MCH=1", {
+test_that("simulateur SaMARE return the expected data with coupe and without Gaules MCH=1", {
   set.seed(NULL)
   set.seed(3)
 
@@ -72,7 +72,7 @@ test_that("simulateur SaMARE return the expected data with gaules and without Ga
 
   set.seed(NULL)
 
-  expect_for_Samare_sans_gaules_et_coupe_test_MCH <- readRDS(test_path("fixtures", "expect_for_Samare_sans_gaules_avec_coupe_avec_MCH_test.rds"))
+  expect_for_Samare_sans_gaules_et_coupe_test_MCH <- readRDS(test_path("fixtures", "expect_for_Samare_sans_gaules_et_coupe_test_MCH.rds"))
   expect_for_Samare_sans_gaules_et_coupe_test_MCH <- expect_for_Samare_sans_gaules_et_coupe_test_MCH %>% mutate(vol_dm3 = round(vol_dm3,0), hauteur_pred = round(hauteur_pred,1))
 
   expect_equal(Result, expect_for_Samare_sans_gaules_et_coupe_test_MCH  )
